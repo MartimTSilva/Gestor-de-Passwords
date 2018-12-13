@@ -627,7 +627,7 @@ int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recurs
                 if (array_acessos[contador].data.hora > 24)
                     printf("Hora inválida.\n");
             }
-            while (array_acessos[contador].data.hora > 24);
+            while (array_acessos[contador].data.hora > 23);
 
             do
             {
