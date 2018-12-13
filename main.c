@@ -34,7 +34,7 @@ typedef struct
     char nome[MAX_CARACTERES];
     char login[MAX_CARACTERES];
     char password[MAX_CARACTERES];
-    t_data;
+    t_data data;
 } t_acessos;
 
 typedef struct
@@ -56,7 +56,7 @@ char MenuGestorRecursos(void);
 char ConfirmarSaida(void);
 char MenuExtras(void);
 void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r);
-int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *seq_ID_Recursos);
+int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador);
 void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, t_data array_data[MAX_ACESSOS]);
 int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, t_data array_data[MAX_ACESSOS]);
 char MenuGestorAcessos(void);
@@ -157,7 +157,7 @@ int main()
                             case 'A':
                                 if (contador_recursos < MAX_RECURSOS) ///Para não deixar exceder o número máximo de recursos permitidos
                                 {
-                                    contador_recursos = InserirRecursos(arr_recursos, contador_recursos, seq_ID_Recursos);
+                                    contador_recursos = InserirRecursos(arr_recursos, contador_recursos);
                                 }
                                 else
                                 {
@@ -445,7 +445,7 @@ char ConfirmarSaida(void)
 }
 
 
-int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *seq_ID_Recursos)
+int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador)
 {
     char nome_recurso[MAX_CARACTERES];
     int encontrado, i;
@@ -488,8 +488,6 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
     }
     printf("\n______________________________________________________________________\n\n");
 
-    (*seq_ID_Recursos)++;
-    array_recursos[i].ID_Recurso = *seq_ID_Recursos;
     getch();
     return contador;
 }
@@ -582,9 +580,8 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
         {
             printf("-----------------");
             printf("\nLogin: %s\nPassword: %s\n", array_acessos[i].login, array_acessos[i].password);
-            printf("Hora: %i\n", array_data[contador].hora);
-            printf("Minutos: %i\n", array_data[contador].minutos);
-            printf("%i/%i/%i", array_data[contador].dia, array_data[contador].mes, array_data[contador].ano);
+            printf("\nHora: %i:%i\n", array_acessos[i].data.hora, array_acessos[i].data.minutos);
+            printf("Data: %i/%i/%i\n", array_acessos[i].data.dia, array_acessos[i].data.mes, array_acessos[i].data.ano);
             printf("-----------------\n");
             contador_acessos++; ///Contador necessário para verificar se não existe nenhum acesso com esse recurso.
         }
@@ -617,22 +614,25 @@ int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recurs
             printf("Login: ");
             scanf(" %s", array_acessos[contador].login);
 
-
             VerificadorPassword(array_recursos, i, &password);
-
-            printf("%s", password);
             strcpy(array_acessos[contador].password, password);
-            printf("Data e hora\n");
+
+            printf("\nIntroduza a data e hora\n");
             printf("Hora: ");
-            scanf("%i", &array_data[contador].hora);
+            fflush(stdin);
+            scanf("%i", &array_acessos[contador].data.hora);
             printf("Minutos: ");
-            scanf("%i", &array_data[contador].minutos);
+            fflush(stdin);
+            scanf("%i", &array_acessos[contador].data.minutos);
             printf("Dia: ");
-            scanf("%i", &array_data[contador].dia);
+            fflush(stdin);
+            scanf("%i", &array_acessos[contador].data.dia);
             printf("Mês: ");
-            scanf("%i", &array_data[contador].mes);
+            fflush(stdin);
+            scanf("%i", &array_acessos[contador].data.mes);
             printf("Ano: ");
-            scanf("%i", &array_data[contador].ano);
+            fflush(stdin);
+            scanf("%i", &array_acessos[contador].data.ano);
 
             contador += 1;
             printf("\nAcesso adicionado com sucesso!");
@@ -661,7 +661,7 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
         do
         {
             espec=0, maiusc=0, minusc=0, num=0;
-            printf("Password: ");
+            printf("\nPassword: ");
             scanf(" %s", verificar_password);
             tamanho=strlen(verificar_password);
             for(i=0; i<tamanho; i++)
@@ -705,7 +705,6 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
                 printf("Password demasiado pequena\n");
         }
         while (espec == 0 || maiusc == 0 || minusc == 0 || num == 0 || tamanho < 8);
-        printf("Sucesso!");
         strcpy(password, verificar_password);
     }
 
@@ -719,7 +718,7 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
         do
         {
             espec=0, maiusc=0, minusc=0, num=0;
-            printf("Password: ");
+            printf("\nPassword: ");
             scanf("%s", verificar_password);
             tamanho=strlen(verificar_password);
             for(i=0; i<tamanho; i++)
@@ -742,7 +741,6 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
 
         }
         while (maiusc == 0 || minusc == 0 || num == 0 || tamanho < 8);
-        printf("Sucesso!");
         strcpy(password, verificar_password);
     }
 
@@ -751,9 +749,8 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
     if (array_recursos[contador].grau_seguranca == 1)
     {
         printf("\nEscolheu o grau de segurança baixo para este recurso, por isso pode ser o que quiser:\n");
-        printf("Password: ");
+        printf("\nPassword: ");
         scanf("%s", verificar_password);
-        printf("Sucesso!");
         strcpy(password, verificar_password);
     }
 }
