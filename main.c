@@ -618,21 +618,56 @@ int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recurs
             strcpy(array_acessos[contador].password, password);
 
             printf("\nIntroduza a data e hora\n");
-            printf("Hora: ");
-            fflush(stdin);
-            scanf("%i", &array_acessos[contador].data.hora);
-            printf("Minutos: ");
-            fflush(stdin);
-            scanf("%i", &array_acessos[contador].data.minutos);
-            printf("Dia: ");
-            fflush(stdin);
-            scanf("%i", &array_acessos[contador].data.dia);
-            printf("Mês: ");
-            fflush(stdin);
-            scanf("%i", &array_acessos[contador].data.mes);
-            printf("Ano: ");
-            fflush(stdin);
-            scanf("%i", &array_acessos[contador].data.ano);
+
+            do
+            {
+                printf("Hora: ");
+                fflush(stdin);
+                scanf("%i", &array_acessos[contador].data.hora);
+                if (array_acessos[contador].data.hora > 24)
+                    printf("Hora inválida.\n");
+            }
+            while (array_acessos[contador].data.hora > 24);
+
+            do
+            {
+                printf("Minutos: ");
+                fflush(stdin);
+                scanf("%i", &array_acessos[contador].data.minutos);
+                if (array_acessos[contador].data.minutos > 59)
+                    printf("Minutos inválidos.\n");
+            }
+            while (array_acessos[contador].data.minutos > 59);
+
+            do
+            {
+                printf("Dia: ");
+                fflush(stdin);
+                scanf("%i", &array_acessos[contador].data.dia);
+                if (array_acessos[contador].data.dia > 31)
+                    printf("Dia inválido.\n");
+            }
+            while (array_acessos[contador].data.dia > 31);
+
+            do
+            {
+                printf("Mês: ");
+                fflush(stdin);
+                scanf("%i", &array_acessos[contador].data.mes);
+                if (array_acessos[contador].data.mes > 12)
+                    printf("Mês inválido.\n");
+            }
+            while (array_acessos[contador].data.mes > 12);
+
+            do
+            {
+                printf("Ano: ");
+                fflush(stdin);
+                scanf("%i", &array_acessos[contador].data.ano);
+                if (array_acessos[contador].data.ano > 2019 || array_acessos[contador].data.ano < 1920)
+                    printf("Ano inválido.\n");
+                }
+            while (array_acessos[contador].data.ano > 2019 || array_acessos[contador].data.ano < 1920);
 
             contador += 1;
             printf("\nAcesso adicionado com sucesso!");
