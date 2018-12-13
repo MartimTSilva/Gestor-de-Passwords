@@ -61,7 +61,7 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
 int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, t_data array_data[MAX_ACESSOS]);
 char MenuGestorAcessos(void);
 void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, int ID_Utilizador);
-
+int InserirAdmin(t_register user_registo[MAX_UTILIZADORES], int contador);
 
 ///Declarações para o menu gerador
 void gerador_num(void);
@@ -87,7 +87,7 @@ int main()
 
     int opc_register;
     t_register user_register[MAX_UTILIZADORES];
-
+    contador_registar = InserirAdmin(user_register, contador_registar);
     do
     {
         do
@@ -261,7 +261,7 @@ int main()
         }
         while (opcao != 'C');
     }
-    while(sair != 'S');
+    while(sair == 'S');
 
     return 0;
 }
@@ -666,7 +666,7 @@ int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recurs
                 scanf("%i", &array_acessos[contador].data.ano);
                 if (array_acessos[contador].data.ano > 2019 || array_acessos[contador].data.ano < 1920)
                     printf("Ano inválido.\n");
-                }
+            }
             while (array_acessos[contador].data.ano > 2019 || array_acessos[contador].data.ano < 1920);
 
             contador += 1;
@@ -931,8 +931,7 @@ int menu_opcao(void)
     printf("\t/____________________________________________________\\\n");
     printf("\n");
     printf("\tOpção --> ");
-    scanf("%i", &opcao);
-    return opcao;
+    scanf("%i", &opcao);    return opcao;
 }
 
 int login(t_register user_registo[MAX_UTILIZADORES],int contador)
@@ -942,7 +941,7 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
     char password_login[MAX_CARACTERES];
     int confirmar=0, i;
 
-
+    system("cls");
 
     printf("\n\t|========================| LOGIN |========================|\n\n");
     printf("\t  Username: ");
@@ -957,14 +956,11 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
         if((strcmp(user_registo[i].username_register,username_login)==0) && (strcmp(user_registo[i].password_register,password_login)==0))
         {
             confirmar=1;
+            break;
         }
     }
 
-    if(strcmp(user_registo[i].username_register,username_login)!=0)
-    {
-
-    }
-    else
+    if(strcmp(user_registo[i].password_register,password_login)!=0)
     {
         printf("\n\t  Credenciais erradas!\n\n");
         getch();
@@ -976,28 +972,33 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
 
 int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_ID_Utlizador)
 {
-    int i, tam, encontrado=0, nif;
+    int i, tam, encontrado=0, nif, existe = 0;
     char utilizador[MAX_CARACTERES];
-
-
-
+    system("cls");
     printf("\n\t|========================| REGISTAR |========================|\n");
-
     do
     {
-        printf("\n\t  Username: ");
-        fflush(stdin);
-        gets(utilizador);
-
-        for(i = 0; i < contador ; i++)
-
+        do
         {
-            if (strcmp(user_registo[i].username_register, utilizador)==0)
+            printf("\n\t  Username: ");
+            fflush(stdin);
+            gets(utilizador);
+
+            for(i = 0; i < contador ; i++)
+
             {
-                printf("\n\t  Esse nome de utilizador já existe.");
+                if (strcmp(user_registo[i].username_register, utilizador)==0)
+                {
+                    printf("\n\t  Esse nome de utilizador já existe.\n");
+                    getch();
+                    break;
+                }
+
             }
-            break;
         }
+        while (utilizador != "admin" && strcmp(user_registo[i].username_register, utilizador)==0);
+
+
         do
         {
             printf("\n\t  Numero de identificação fiscal (NIF): ");
@@ -1008,19 +1009,22 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
             {
                 printf("\n\t  O NIF necissita de ter 9 numeros. \n");
             }
-        }
-        while(nif < 111111111 || nif > 999999999);
-
-        for(i=0; i< contador; i++)
-        {
-            if (user_registo[i].NIF_register==nif)
+            for(i=0; i< contador; i++)
             {
-                printf("\n\t  Esse NIF já existe.");
+                if (user_registo[i].NIF_register==nif)
+                {
+                    existe = 1;
+                    printf("\n\t  Esse NIF já existe.");
+                }
+                else{
+                    existe = 0;
+                }
             }
-            break;
         }
+        while(nif > 111111111 && nif < 999999999 && existe==1);
+
     }
-    while(strcmp(user_registo[i].username_register, utilizador)==0 && user_registo[i].NIF_register==nif);
+    while(strcmp(user_registo[i].username_register, utilizador)==0 && user_registo[contador].NIF_register==nif);
 
     printf("\n\t  Password: ");
     scanf("%s", user_registo[contador].password_register);
@@ -1044,4 +1048,12 @@ void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, in
         printf("Palavra-Pass: %s\n", user_register[i].password_register);
         printf("ID: %i\n", user_register[i].ID_Utilizador);
     }
+}
+int InserirAdmin(t_register user_register[MAX_UTILIZADORES], int contador)
+{
+    user_register[contador].ID_Utilizador=0;
+    user_register[contador].NIF_register=999999999;
+    strcpy(user_register[contador].username_register, "admin");
+    strcpy(user_register[contador].password_register, "admin");
+    return contador+1;
 }
