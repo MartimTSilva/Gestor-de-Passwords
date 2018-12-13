@@ -103,8 +103,13 @@ int main()
                 break;
             case 3:
                 sair = ConfirmarSaida();
-                return 0;
-                break;
+                if(sair=='S')
+                    return 0;
+                else
+                    break;
+            default:
+                printf("\n\tOpção Inválida!\n");
+                getch();
             }
         }
         while(confirmarLogin != 1);
@@ -186,8 +191,9 @@ int main()
                         break;
 
                     case 'C':
+                        if(user_register[contador_registar].ID_Utilizador == 0)
                         VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
-                        getch();
+                        else
                         break;
                     case 'D':
                         printf("\nA funcionalidade das estatisticas ainda não está feito\n");
@@ -255,15 +261,17 @@ int main()
                 break;
             case 'S':
                 sair = ConfirmarSaida();
-                return 0;
-                break;
+                if(sair == 'S')
+                    return 0;
+                else
+                    break;
             default:
                 printf("\n\tOpção Inválida!\n");
             }
         }
         while (opcao != 'C');
     }
-    while(sair == 'S');
+    while(sair != 'S');
 
     return 0;
 }
@@ -933,7 +941,8 @@ int menu_opcao(void)
     printf("\t/____________________________________________________\\\n");
     printf("\n");
     printf("\tOpção --> ");
-    scanf("%i", &opcao);    return opcao;
+    scanf("%i", &opcao);
+    return opcao;
 }
 
 int login(t_register user_registo[MAX_UTILIZADORES],int contador)
@@ -1002,7 +1011,7 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
 
 
         do
-        {
+        {do{
             printf("\n\t  Numero de identificação fiscal (NIF): ");
 
             fflush(stdin);
@@ -1011,14 +1020,17 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
             {
                 printf("\n\t  O NIF necissita de ter 9 numeros. \n");
             }
+        }
+            while(nif < 111111111 || nif > 999999999);
             for(i=0; i< contador; i++)
             {
                 if (user_registo[i].NIF_register==nif)
                 {
                     existe = 1;
-                    printf("\n\t  Esse NIF já existe.");
+                    printf("\n\t  Esse NIF já existe.\n");
                 }
-                else{
+                else
+                {
                     existe = 0;
                 }
             }
@@ -1047,7 +1059,7 @@ void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, in
     {
         printf("Nome de Utilizador : %s\n", user_register[i].username_register);
         printf("Numero de identificação fiscal: %i\n", user_register[i].NIF_register);
-        printf("Palavra-Pass: %s\n", user_register[i].password_register);
+        printf("Palavra-Passe: %s\n", user_register[i].password_register);
         printf("ID: %i\n", user_register[i].ID_Utilizador);
     }
 }
