@@ -942,7 +942,8 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
     char password_login[MAX_CARACTERES];
     int confirmar=0, i;
 
-    system("cls");
+
+
     printf("\n\t|========================| LOGIN |========================|\n\n");
     printf("\t  Username: ");
     fflush(stdin);
@@ -977,7 +978,9 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
 {
     int i, tam, encontrado=0, nif;
     char utilizador[MAX_CARACTERES];
-    system("cls");
+
+
+
     printf("\n\t|========================| REGISTAR |========================|\n");
 
     do
@@ -1031,8 +1034,6 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
 
     return contador+1;
 }
-
-
 void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, int ID_Utilizador)
 {
     int i;
