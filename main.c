@@ -27,7 +27,7 @@ typedef struct
     int dia;
     int mes;
     int ano;
-}t_data;
+} t_data;
 
 typedef struct
 {
@@ -39,6 +39,7 @@ typedef struct
 
 typedef struct
 {
+    int ID_Recurso;
     int identificador;
     char nome[MAX_CARACTERES];
     char tipo_recurso[MAX_CARACTERES];
@@ -55,7 +56,7 @@ char MenuGestorRecursos(void);
 char ConfirmarSaida(void);
 char MenuExtras(void);
 void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r);
-int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador);
+int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *seq_ID_Recursos);
 void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, t_data array_data[MAX_ACESSOS]);
 int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, t_data array_data[MAX_ACESSOS]);
 char MenuGestorAcessos(void);
@@ -82,7 +83,7 @@ int main()
     t_data array_data[MAX_ACESSOS];
     t_acessos arr_acessos[MAX_ACESSOS] = {"", "", ""};
     t_recursos arr_recursos[MAX_RECURSOS] = {"", "", "", "", ""};
-    int contador_array_recursos = 0, pwd, contador_recursos = 0,confirmarLogin, contador_registar=0, seq_ID_Utlizador=0;
+    int contador_array_recursos = 0, pwd, contador_recursos = 0,confirmarLogin, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos;
 
     int opc_register;
     t_register user_register[MAX_UTILIZADORES];
@@ -156,7 +157,7 @@ int main()
                             case 'A':
                                 if (contador_recursos < MAX_RECURSOS) ///Para não deixar exceder o número máximo de recursos permitidos
                                 {
-                                    contador_recursos = InserirRecursos(arr_recursos, contador_recursos);
+                                    contador_recursos = InserirRecursos(arr_recursos, contador_recursos, seq_ID_Recursos);
                                 }
                                 else
                                 {
@@ -184,7 +185,7 @@ int main()
                         break;
 
                     case 'C':
-                        VerUtilizadores(user_register, contador_registar, seq_ID_Utlizador);
+                        VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
                         getch();
                         break;
                     case 'D':
@@ -444,7 +445,7 @@ char ConfirmarSaida(void)
 }
 
 
-int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador)
+int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *seq_ID_Recursos)
 {
     char nome_recurso[MAX_CARACTERES];
     int encontrado, i;
@@ -486,6 +487,9 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador)
         contador+=1;
     }
     printf("\n______________________________________________________________________\n\n");
+
+    (*seq_ID_Recursos)++;
+    array_recursos[i].ID_Recurso = *seq_ID_Recursos;
     getch();
     return contador;
 }
@@ -525,6 +529,7 @@ void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int cont
             printf("Tipo de recurso: %s\n", array_recursos[i].tipo_recurso);
             printf("Designação única: %s\n", array_recursos[i].designacao);
             printf("Grau de segurança: %i\n", array_recursos[i].grau_seguranca);
+            printf("ID: %i\n", array_recursos[i].ID_Recurso);
             contador_recursos++;
         }
     }
@@ -1005,6 +1010,5 @@ void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, in
         printf("Numero de identificação fiscal: %i\n", user_register[i].NIF_register);
         printf("Palavra-Pass: %s\n", user_register[i].password_register);
         printf("ID: %i\n", user_register[i].ID_Utilizador);
-
     }
 }
