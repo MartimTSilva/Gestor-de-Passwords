@@ -254,6 +254,7 @@ int main()
                 break;
             case 'S':
                 sair = ConfirmarSaida();
+                return 0;
                 break;
             default:
                 printf("\n\tOpção Inválida!\n");
