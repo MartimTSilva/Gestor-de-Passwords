@@ -990,7 +990,6 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
     printf("\t|============================================================|\n");
     (*seq_ID_Utlizador)++;
     user_registo[contador].ID_Utilizador = *seq_ID_Utlizador;
-    printf("ID: %i", *seq_ID_Utlizador);
     getch();
 
     return contador+1;
