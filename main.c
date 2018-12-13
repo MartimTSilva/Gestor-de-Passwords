@@ -905,7 +905,7 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
     char password_login[MAX_CARACTERES];
     int confirmar=0, i;
 
-    system("cls");
+
     printf("\n\t|========================| LOGIN |========================|\n\n");
     printf("\t  Username: ");
     fflush(stdin);
