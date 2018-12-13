@@ -103,6 +103,7 @@ int main()
                 break;
             case 3:
                 sair = ConfirmarSaida();
+                return 0;
                 break;
             }
         }
