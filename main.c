@@ -10,6 +10,7 @@
 
 typedef struct  ///REGISTER
 {
+    char username_login;
     int ID_Utilizador;
     int NIF_register;
     char username_register[20];
@@ -83,7 +84,7 @@ int main()
     t_data array_data[MAX_ACESSOS];
     t_acessos arr_acessos[MAX_ACESSOS] = {"", "", ""};
     t_recursos arr_recursos[MAX_RECURSOS] = {"", "", "", "", ""};
-    int contador_array_recursos = 0, pwd, contador_recursos = 0,confirmarLogin, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos;
+    int contador_array_recursos = 0, pwd, contador_recursos = 0,confirmarLogin = 99, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos;
 
     int opc_register;
     t_register user_register[MAX_UTILIZADORES];
@@ -112,8 +113,8 @@ int main()
                 getch();
             }
         }
-        while(confirmarLogin != 1);
-        confirmarLogin=0;
+        while(confirmarLogin == 99);
+
         do
         {
             opcao=menuPrincipal();
@@ -191,9 +192,19 @@ int main()
                         break;
 
                     case 'C':
-                        if(user_register[contador_registar].ID_Utilizador == 0)
-                        VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
+                        if(user_register[confirmarLogin].ID_Utilizador == 0 )
+                        {
+                           VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
+                            getch();
+                        }
                         else
+                        {
+                            printf("Não tem premissões para esse comando");
+                            getch();
+                        }
+
+
+
                         break;
                     case 'D':
                         printf("\nA funcionalidade das estatisticas ainda não está feito\n");
@@ -950,7 +961,7 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
     char NIF_login[10];
     char username_login[MAX_CARACTERES];
     char password_login[MAX_CARACTERES];
-    int confirmar=0, i;
+    int confirmar=99, i;
 
     system("cls");
 
@@ -966,7 +977,7 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
     {
         if((strcmp(user_registo[i].username_register,username_login)==0) && (strcmp(user_registo[i].password_register,password_login)==0))
         {
-            confirmar=1;
+            confirmar=i;
             break;
         }
     }
@@ -975,6 +986,10 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
     {
         printf("\n\t  Credenciais erradas!\n\n");
         getch();
+    }
+    else
+    {
+        printf("\nUsername invalido");
     }
 
     return confirmar;
@@ -1011,16 +1026,18 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
 
 
         do
-        {do{
-            printf("\n\t  Numero de identificação fiscal (NIF): ");
-
-            fflush(stdin);
-            scanf("%i", &nif);
-            if(nif < 111111111 || nif > 999999999)
+        {
+            do
             {
-                printf("\n\t  O NIF necissita de ter 9 numeros. \n");
+                printf("\n\t  Numero de identificação fiscal (NIF): ");
+
+                fflush(stdin);
+                scanf("%i", &nif);
+                if(nif < 111111111 || nif > 999999999)
+                {
+                    printf("\n\t  O NIF necissita de ter 9 numeros. \n");
+                }
             }
-        }
             while(nif < 111111111 || nif > 999999999);
             for(i=0; i< contador; i++)
             {
@@ -1062,6 +1079,7 @@ void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, in
         printf("Palavra-Passe: %s\n", user_register[i].password_register);
         printf("ID: %i\n", user_register[i].ID_Utilizador);
     }
+
 }
 int InserirAdmin(t_register user_register[MAX_UTILIZADORES], int contador)
 {
