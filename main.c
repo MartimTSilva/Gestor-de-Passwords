@@ -20,12 +20,16 @@ typedef struct  ///REGISTER
 
 typedef struct
 {
-    int hora;
-    int minutos;
     int dia;
     int mes;
     int ano;
 } t_data;
+
+typedef struct
+{
+    int hora;
+    int minutos;
+} t_hour;
 
 typedef struct
 {
@@ -35,6 +39,7 @@ typedef struct
     char login[MAX_CARACTERES];
     char password[MAX_CARACTERES];
     t_data data;
+    t_hour hora;
 } t_acessos;
 
 typedef struct
@@ -75,18 +80,24 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
 int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *seq_ID_Recursos);
 void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r);
 int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_ACESSOS], int contador, int contador_r,int id_utilizador);
-void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador);
+void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador, char mostrar[MAX_CARACTERES]);
 void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, int ID_Utilizador);
 int InserirAdmin(t_register user_registo[MAX_UTILIZADORES], int contador);
 void ler_ficheiro(t_register user_register[], int *contador);
 void guardar_ficheiro(t_register user_register[], int contador);
 
 
+void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r);
+void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador);
+
+t_data getdate();
+t_hour gethour();
+
 int main()
 {
     system("chcp 65001"); //Para usar caracteres especiais.
     system("cls"); //Limpa o ecrã
-    char opcao, opcao2, opcao3, opcao4, opcao5, opcao6, sair;
+    char opcao, opcao2, opcao3, opcao4, opcao5, opcao6, sair, string[MAX_CARACTERES];
     t_data array_data[MAX_ACESSOS];
     t_acessos arr_acessos[MAX_ACESSOS] = {"", "", ""};
     t_recursos arr_recursos[MAX_RECURSOS] = {"", "", "", "", ""};
@@ -97,6 +108,9 @@ int main()
     contador_registar = InserirAdmin(user_register, contador_registar);
 
     ler_ficheiro(user_register, &contador_registar);
+    VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
+    printf("\ncontador: %d", contador_registar);
+
     do
     {
         do
@@ -162,7 +176,10 @@ int main()
                                 }
                                 break;
                             case 'B':
-                                VerAcessos(arr_acessos, arr_recursos, contador_array_recursos, contador_recursos, confirmarLogin);
+                                VerAcessos(arr_acessos, arr_recursos, contador_array_recursos, contador_recursos, confirmarLogin, string);
+                                break;
+                            case 'C':
+                                AlterarAcessos(arr_acessos, arr_recursos, contador_array_recursos, contador_recursos, confirmarLogin);
                                 break;
                             case 'V':
                                 break;
@@ -177,6 +194,7 @@ int main()
                         do
                         {
                             opcao4 = MenuGestorRecursos();
+                            printf("GRAU DE SEGUNRACA: %d", array_recursos[contador_recursos-1].grau_seguranca);
                             switch(opcao4)
                             {
                             case 'A':
@@ -194,7 +212,7 @@ int main()
                                 VerRecursos(arr_recursos, contador_recursos, contador_recursos);
                                 break;
                             case 'C':
-                                printf("\nA funcionalidade alterar recursos está incompleta");
+                                AlterarRecursos(arr_recursos, contador_recursos);
                                 break;
                             case 'D':
                                 printf("\nA funcionalidade eliminar recursos está incompleta");
@@ -328,6 +346,7 @@ char menuPrincipal(void)
     printf("\tOpção --> ");
     fflush(stdin);
     scanf(" %c", &opcao);
+
     opcao = toupper(opcao);
 
     return opcao;
@@ -370,7 +389,7 @@ char MenuGestorAcessos(void)
     printf("\t/                                              \\\n");
     printf("\t\\  A - Inserir Acessos                         /\n");
     printf("\t/  B - Consultar Acessos                       \\\n");
-    printf("\t\\  C - Alterar Acessos (Incompleto)            /\n");
+    printf("\t\\  C - Alterar Acessos                         /\n");
     printf("\t/  D - Eliminar Acessos (Incompleto)           \\\n");
     printf("\t\\  V - Voltar                                  /\n");
     printf("\t/______________________________________________\\\n");
@@ -395,7 +414,7 @@ char MenuGestorRecursos(void)
     printf("\t/                                                \\\n");
     printf("\t\\  A - Inserir Recursos                          /\n");
     printf("\t/  B - Consultar Recursos                        \\\n");
-    printf("\t\\  C - Alterar Recursos (Incompleto)             /\n");
+    printf("\t\\  C - Alterar Recursos                          /\n");
     printf("\t/  D - Eliminar Recursos (Incompleto)            \\\n");
     printf("\t\\  V - Voltar                                    /\n");
     printf("\t/________________________________________________\\\n");
@@ -526,8 +545,7 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
             printf("Grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): ");
             fflush(stdin);
             scanf("%d", &array_recursos[i].grau_seguranca);
-        }
-        while (array_recursos[i].grau_seguranca <1 || array_recursos[i].grau_seguranca > 3);
+        }while (array_recursos[i].grau_seguranca <1 || array_recursos[i].grau_seguranca > 3);
         printf("\nRecurso criado com sucesso!");
         contador+=1;
     }
@@ -535,6 +553,7 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
 
     array_recursos[i].ID_Recurso = *seq_ID_Recursos;
     (*seq_ID_Recursos)++;
+    printf("GRAU DE SEGUNRACA: %d", array_recursos[i].grau_seguranca);
     getch();
     return contador;
 }
@@ -592,9 +611,8 @@ void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int cont
 }
 
 
-void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador)
+void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador, char mostrar[MAX_CARACTERES])
 {
-    char mostrar[MAX_CARACTERES];
     int i = 0, encontrado=99, contador_acessos=0, contador_recursos=0,comparar_recursos, posicao_acesso;
 
     printf("______________________________________________________________________\n\n");
@@ -628,7 +646,7 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
         {
             printf("-----------------");
             printf("\nLogin: %s\nPassword: %s\n", array_acessos[i].login, array_acessos[i].password);
-            printf("\nHora: %i:%i\n", array_acessos[i].data.hora, array_acessos[i].data.minutos);
+            printf("\nHora: %i:%i\n", array_acessos[i].hora.hora, array_acessos[i].hora.minutos);
             printf("Data: %i/%i/%i\n", array_acessos[i].data.dia, array_acessos[i].data.mes, array_acessos[i].data.ano);
             printf("-----------------\n");
             contador_acessos++; ///Contador necessário para verificar se não existe nenhum acesso com esse recurso.
@@ -637,6 +655,7 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
 
     if(contador_acessos == 0)
         printf("O recurso que introduziu não tem acessos.\n");
+
     printf("______________________________________________________________________\n\n");
     getch();
 }
@@ -669,57 +688,9 @@ int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recurs
             VerificadorPassword(array_recursos, i, &password);
             strcpy(array_acessos[contador].password, password);
 
-            printf("\nIntroduza a data e hora\n");
 
-            do
-            {
-                printf("Hora: ");
-                fflush(stdin);
-                scanf("%i", &array_acessos[contador].data.hora);
-                if (array_acessos[contador].data.hora > 23)
-                    printf("Hora inválida.\n");
-            }
-            while (array_acessos[contador].data.hora > 23);
-
-            do
-            {
-                printf("Minutos: ");
-                fflush(stdin);
-                scanf("%i", &array_acessos[contador].data.minutos);
-                if (array_acessos[contador].data.minutos > 59)
-                    printf("Minutos inválidos.\n");
-            }
-            while (array_acessos[contador].data.minutos > 59);
-
-            do
-            {
-                printf("Dia: ");
-                fflush(stdin);
-                scanf("%i", &array_acessos[contador].data.dia);
-                if (array_acessos[contador].data.dia > 31)
-                    printf("Dia inválido.\n");
-            }
-            while (array_acessos[contador].data.dia > 31);
-
-            do
-            {
-                printf("Mês: ");
-                fflush(stdin);
-                scanf("%i", &array_acessos[contador].data.mes);
-                if (array_acessos[contador].data.mes > 12)
-                    printf("Mês inválido.\n");
-            }
-            while (array_acessos[contador].data.mes > 12);
-
-            do
-            {
-                printf("Ano: ");
-                fflush(stdin);
-                scanf("%i", &array_acessos[contador].data.ano);
-                if (array_acessos[contador].data.ano > 2019 || array_acessos[contador].data.ano < 1920)
-                    printf("Ano inválido.\n");
-            }
-            while (array_acessos[contador].data.ano > 2019 || array_acessos[contador].data.ano < 1920);
+            array_acessos[contador].hora = gethour();
+            array_acessos[contador].data = getdate();
 
             contador += 1;
             printf("\nAcesso adicionado com sucesso!");
@@ -741,9 +712,11 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
 {
     int espec=0,maiusc=0,minusc=0, num=0,i=0, tamanho;
     char verificar_password[25];
-
+printf("DUDE WHAT??????");
+printf("grau de seguranca %d", array_recursos[contador].grau_seguranca);
     if (array_recursos[contador].grau_seguranca == 3)
     {
+        printf("DUDE WHAT THE FUCK 3");
         printf("\nEscolheu o grau de segurança máximo para este recurso, por isso a sua password tem que ter:\n");
         printf("Pelo menos 8 caracteres, um número, um caracter especial, uma letra maiúscula e minúscula.\n\n");
         do
@@ -799,6 +772,7 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
 
     if (array_recursos[contador].grau_seguranca == 2)
     {
+         printf("DUDE WHAT THE FUCK 2");
         printf("\nEscolheu o grau de segurança médio para este recurso, por isso a sua password tem que ter:\n");
         printf("Pelo menos 8 caracteres, um número, uma letra maiúscula e minúscula.\n\n");
         do
@@ -833,6 +807,7 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
 
     if (array_recursos[contador].grau_seguranca == 1)
     {
+         printf("DUDE WHAT THE FUCK 1");
         printf("\nEscolheu o grau de segurança baixo para este recurso, por isso pode ser o que quiser:\n");
         printf("\nPassword: ");
         scanf("%s", verificar_password);
@@ -1030,6 +1005,8 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
     char utilizador[MAX_CARACTERES];
     system("cls");
     printf("\n\t|========================| REGISTAR |========================|\n");
+    printf("contador: %d", contador);
+    printf("seq_ID_Utlizador: %d", seq_ID_Utlizador);
     do
     {
         do
@@ -1095,7 +1072,7 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
     printf("\n\t  Registo efetuado com sucesso.\n\n");
     printf("\t|============================================================|\n");
     (*seq_ID_Utlizador)++;
-    user_registo[contador].ID_Utilizador = contador;
+    user_registo[contador].ID_Utilizador = *seq_ID_Utlizador;
     getch();
 
     return contador+1;
@@ -1154,10 +1131,12 @@ void ler_ficheiro(t_register user_register[], int *contador)
     }
 }
 
-void guardar_ficheiro(t_register user_register[], int contador){
+void guardar_ficheiro(t_register user_register[], int contador)
+{
     FILE *ficheiro;
     ficheiro = fopen("dados.dat", "wb");
-    if (ficheiro == NULL){
+    if (ficheiro == NULL)
+    {
         printf("Ficheiro Inexistente\n\n");
     }
     else
@@ -1167,3 +1146,143 @@ void guardar_ficheiro(t_register user_register[], int contador){
         fclose(ficheiro);
     }
 }
+
+void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r)
+{
+    char mostrar[MAX_CARACTERES];
+    int comparar_recursos, i;
+
+    printf("Indique o nome do recurso que pretende alterar: ");
+    fflush(stdin);
+    gets(mostrar);
+    printf("\n");
+
+    for (i = 0; i < contador_r; i++)
+    {
+        comparar_recursos = strcasecmp(array_recursos[i].nome, mostrar);
+        if (comparar_recursos == 0)
+        {
+            printf("Tipo de recurso atual: %s\n", array_recursos[i].tipo_recurso);
+            printf("Novo tipo de recurso: ");
+            fflush(stdin);
+            gets(array_recursos[i].tipo_recurso);
+
+            printf("Designação única atual: %s\n", array_recursos[i].designacao);
+            printf("Nova designação única: ");
+            fflush(stdin);
+            gets(array_recursos[i].designacao);
+
+            printf("Grau de segurança atual: %i\n", array_recursos[i].grau_seguranca);
+            do
+            {
+                printf("Novo grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): ");
+                fflush(stdin);
+                scanf("%d", &array_recursos[i].grau_seguranca);
+            }
+            while (array_recursos[i].grau_seguranca <1 || array_recursos[i].grau_seguranca > 3);
+            printf("\nRecurso criado com sucesso!");
+        }
+    }
+}
+
+void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador)
+{
+    char login[MAX_CARACTERES], mostrar[MAX_CARACTERES], password[MAX_CARACTERES];
+    int encontrado, encontrado2;
+
+    VerAcessos(array_acessos, array_recursos, contador, contador_r, id_utilizador, mostrar);
+    printf("Indique o LOGIN ATUAL do acesso que pretende alterar: ");
+    gets(login);
+
+    for(int i = 0; i < contador_r; i++)
+    {
+        printf("CENAS1");
+        encontrado = strcasecmp(array_recursos[i].nome, mostrar);
+        if (encontrado == 0)
+        {
+            printf("CENAS2");
+            for (int i = 0; i < contador; i++)
+            {
+                printf("CENAS3");
+                encontrado2 = strcasecmp(array_acessos[i].login, login);
+                if (encontrado2 == 0 && array_acessos[i].id_utilizador == id_utilizador)
+                {
+                    printf("GRAU DE SEGUNRANCA %d", array_recursos[i].grau_seguranca);
+                    printf("\nInsira os seus novos dados\n\n");
+                    printf("Login: ");
+                    scanf(" %s", array_acessos[i].login);
+
+                    VerificadorPassword(array_recursos, i, array_acessos[i].password);
+
+                    array_acessos[i].hora = gethour();
+                    array_acessos[i].data = getdate();
+
+                }
+            }
+        }
+    }
+    getch();
+}
+
+
+t_data getdate()
+{
+    t_data date;
+
+    do
+    {
+        printf("Dia: ");
+        fflush(stdin);
+        scanf("%i", &date.dia);
+        if (date.dia > 31)
+            printf("Dia inválido.\n");
+    }
+    while (date.dia > 31);
+
+    do
+    {
+        printf("Mês: ");
+        fflush(stdin);
+        scanf("%i", &date.mes);
+        if (date.mes > 12)
+            printf("Mês inválido.\n");
+    }
+    while (date.mes > 12);
+
+    do
+    {
+        printf("Ano: ");
+        fflush(stdin);
+        scanf("%i", &date.ano);
+        if (date.ano > 2019 || date.ano < 1920)
+            printf("Ano inválido.\n");
+    }
+    while (date.ano > 2019 || date.ano < 1920);
+    return date;
+}
+
+t_hour gethour()
+{
+    t_hour hour;
+    do
+    {
+        printf("Hora: ");
+        fflush(stdin);
+        scanf("%i", &hour.hora);
+        if (hour.hora > 23)
+            printf("Hora inválida.\n");
+    }
+    while (hour.hora > 23);
+
+    do
+    {
+        printf("Minutos: ");
+        fflush(stdin);
+        scanf("%i", &hour.minutos);
+        if (hour.minutos > 59)
+            printf("Minutos inválidos.\n");
+    }
+    while (hour.minutos > 59);
+    return hour;
+}
+
