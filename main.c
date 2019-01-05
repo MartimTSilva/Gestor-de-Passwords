@@ -97,9 +97,6 @@ int main()
     contador_registar = InserirAdmin(user_register, contador_registar);
 
     ler_ficheiro(user_register, &contador_registar);
-    VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
-    printf("\ncontador: %d", contador_registar);
-
     do
     {
         do
@@ -1033,8 +1030,6 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
     char utilizador[MAX_CARACTERES];
     system("cls");
     printf("\n\t|========================| REGISTAR |========================|\n");
-    printf("contador: %d", contador);
-    printf("seq_ID_Utlizador: %d", seq_ID_Utlizador);
     do
     {
         do
@@ -1100,7 +1095,7 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
     printf("\n\t  Registo efetuado com sucesso.\n\n");
     printf("\t|============================================================|\n");
     (*seq_ID_Utlizador)++;
-    user_registo[contador].ID_Utilizador = *seq_ID_Utlizador;
+    user_registo[contador].ID_Utilizador = contador;
     getch();
 
     return contador+1;
