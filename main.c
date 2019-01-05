@@ -194,13 +194,13 @@ int main()
                         do
                         {
                             opcao4 = MenuGestorRecursos();
-                            printf("GRAU DE SEGUNRACA: %d", array_recursos[contador_recursos-1].grau_seguranca);
                             switch(opcao4)
                             {
                             case 'A':
                                 if (contador_recursos < MAX_RECURSOS) ///Para não deixar exceder o número máximo de recursos permitidos
                                 {
                                     contador_recursos = InserirRecursos(arr_recursos, contador_recursos, &seq_ID_Recursos);
+
                                 }
                                 else
                                 {
@@ -712,11 +712,8 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
 {
     int espec=0,maiusc=0,minusc=0, num=0,i=0, tamanho;
     char verificar_password[25];
-printf("DUDE WHAT??????");
-printf("grau de seguranca %d", array_recursos[contador].grau_seguranca);
     if (array_recursos[contador].grau_seguranca == 3)
     {
-        printf("DUDE WHAT THE FUCK 3");
         printf("\nEscolheu o grau de segurança máximo para este recurso, por isso a sua password tem que ter:\n");
         printf("Pelo menos 8 caracteres, um número, um caracter especial, uma letra maiúscula e minúscula.\n\n");
         do
@@ -772,7 +769,6 @@ printf("grau de seguranca %d", array_recursos[contador].grau_seguranca);
 
     if (array_recursos[contador].grau_seguranca == 2)
     {
-         printf("DUDE WHAT THE FUCK 2");
         printf("\nEscolheu o grau de segurança médio para este recurso, por isso a sua password tem que ter:\n");
         printf("Pelo menos 8 caracteres, um número, uma letra maiúscula e minúscula.\n\n");
         do
@@ -807,7 +803,6 @@ printf("grau de seguranca %d", array_recursos[contador].grau_seguranca);
 
     if (array_recursos[contador].grau_seguranca == 1)
     {
-         printf("DUDE WHAT THE FUCK 1");
         printf("\nEscolheu o grau de segurança baixo para este recurso, por isso pode ser o que quiser:\n");
         printf("\nPassword: ");
         scanf("%s", verificar_password);
@@ -1196,23 +1191,19 @@ void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recur
 
     for(int i = 0; i < contador_r; i++)
     {
-        printf("CENAS1");
         encontrado = strcasecmp(array_recursos[i].nome, mostrar);
         if (encontrado == 0)
         {
-            printf("CENAS2");
             for (int i = 0; i < contador; i++)
             {
-                printf("CENAS3");
                 encontrado2 = strcasecmp(array_acessos[i].login, login);
                 if (encontrado2 == 0 && array_acessos[i].id_utilizador == id_utilizador)
                 {
-                    printf("GRAU DE SEGUNRANCA %d", array_recursos[i].grau_seguranca);
                     printf("\nInsira os seus novos dados\n\n");
                     printf("Login: ");
                     scanf(" %s", array_acessos[i].login);
 
-                    VerificadorPassword(array_recursos, i, array_acessos[i].password);
+                    VerificadorPassword(array_recursos, array_acessos[i].id_recurso, array_acessos[i].password);
 
                     array_acessos[i].hora = gethour();
                     array_acessos[i].data = getdate();
