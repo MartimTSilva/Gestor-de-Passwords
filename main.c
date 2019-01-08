@@ -1378,7 +1378,7 @@ void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int con
     char utilizador[MAX_CARACTERES];
     do
     {
-        printf("\n\t  Username: ");
+        printf("\n\tInsira o seu novo login: ");
         fflush(stdin);
         gets(utilizador);
 
