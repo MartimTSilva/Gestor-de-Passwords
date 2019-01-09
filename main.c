@@ -96,7 +96,7 @@ char MenuAlterarUtilizadores();
 void AlterarUtilizadores(t_register user_register[MAX_UTILIZADORES], int contador);
 void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r);
 void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador);
-
+void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador);
 t_data getdate();
 t_hour gethour();
 
@@ -188,6 +188,8 @@ int main()
                             case 'C':
                                 AlterarAcessos(arr_acessos, arr_recursos, contador_array_recursos, contador_recursos, confirmarLogin);
                                 break;
+                            case 'D':
+                                EliminarAcessos(arr_acessos, arr_recursos, &contador_array_recursos, contador_recursos, confirmarLogin);
                             case 'V':
                                 break;
                             default:
@@ -611,7 +613,6 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
 
     array_recursos[i].ID_Recurso = *seq_ID_Recursos;
     (*seq_ID_Recursos)++;
-    printf("GRAU DE SEGUNRACA: %d", array_recursos[i].grau_seguranca);
     getch();
     return contador;
 }
@@ -1242,7 +1243,7 @@ void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recur
     int encontrado, encontrado2;
 
     VerAcessos(array_acessos, array_recursos, contador, contador_r, id_utilizador, mostrar);
-    printf("Indique o LOGIN ATUAL do acesso que pretende alterar: ");
+    printf("Indique o LOGIN ATUAL do acesso que pretende alterar ou eleminar: ");
     gets(login);
 
     for(int i = 0; i < contador_r; i++)
@@ -1438,4 +1439,45 @@ void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int conta
     }
     while(NIC > 11111111 && NIC < 99999999 && existe==1);
     user_registo[contador].NIC_register = NIC;
+}
+void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador)
+{
+    char login[MAX_CARACTERES], mostrar[MAX_CARACTERES], password[MAX_CARACTERES], confirm;
+    int encontrado, encontrado2;
+
+    VerAcessos(array_acessos, array_recursos, *contador, contador_r, id_utilizador, mostrar);
+    printf("Indique o LOGIN ATUAL do acesso que pretende eliminar: ");
+    gets(login);
+
+    for(int i = 0; i < contador_r; i++)
+    {
+        encontrado = strcasecmp(array_recursos[i].nome, mostrar);
+        if (encontrado == 0)
+        {
+            printf("Var I: %d", i);
+            for (int y = 0; y < *contador; y++)
+            {
+                encontrado2 = strcasecmp(array_acessos[y].login, login);
+                if (encontrado2 == 0 && array_acessos[y].id_utilizador == id_utilizador)
+                {
+                    printf("Var Y: %d", y);
+                    for(int x = 0; x< y; x++)
+                    {
+                        printf("Var x: %d", x);
+                        strcpy(array_acessos[x].login, array_acessos[x+1].login);
+                        strcpy(array_acessos[x].nome, array_acessos[x+1].nome);
+                        //strcpy(array_acessos[x].password, array_acessos[x+1].password);
+                        strcpy(array_acessos[x].password, "DELETE");
+                        array_acessos[x].id_recurso=array_acessos[x+1].id_recurso;
+                        array_acessos[x].id_utilizador=array_acessos[x+1].id_utilizador;
+                        array_acessos[x].data=array_acessos[x+1].data;
+                        array_acessos[x].hora=array_acessos[x+1].hora;
+
+                    }
+                    //(*contador)--;
+                }
+            }
+        }
+    }
+    getch();
 }
