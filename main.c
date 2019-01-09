@@ -1263,7 +1263,6 @@ void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recur
 
                     array_acessos[i].hora = gethour();
                     array_acessos[i].data = getdate();
-
                 }
             }
         }
