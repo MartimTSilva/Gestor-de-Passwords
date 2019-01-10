@@ -97,6 +97,8 @@ void AlterarUtilizadores(t_register user_register[MAX_UTILIZADORES], int contado
 void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r);
 void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador);
 void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador);
+void EleminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador);
+
 t_data getdate();
 t_hour gethour();
 
@@ -224,7 +226,7 @@ int main()
                                 AlterarRecursos(arr_recursos, contador_recursos);
                                 break;
                             case 'D':
-                                printf("\nA funcionalidade eliminar recursos está incompleta");
+                                EleminarRecursos(arr_acessos, arr_recursos, &contador_array_recursos, contador_recursos, confirmarLogin);
                                 break;
                             case 'V':
                                 break;
@@ -1475,7 +1477,6 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
     for(int i = 0; i < contador_r; i++)
     {
         encontrado = strcasecmp(array_recursos[i].nome, mostrar);
-        printf("\narray_recursos[i].nome: %s\n\n", array_recursos[i].nome);
         if (encontrado == 0)
         {
             for (int y = 0; y < *contador; y++)
@@ -1495,6 +1496,50 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
                     }
                     (*contador)--;
                 }
+            }
+        }
+    }
+    getch();
+}
+
+void EleminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador)
+{
+    char recurso[MAX_CARACTERES], mostrar[MAX_CARACTERES], password[MAX_CARACTERES], confirm;
+    int encontrado;
+
+    VerAcessos(array_acessos, array_recursos, *contador, contador_r, id_utilizador, recurso);
+    printf("Indique o nome do recurso que pretende eliminar: ");
+    gets(recurso);
+
+    for(int i = 0; i < contador_r; i++)
+    {
+        encontrado = strcasecmp(array_recursos[i].nome, recurso);
+        if (encontrado == 0)
+        {
+            for (int y = 0; y < *contador; y++)
+            {
+                if (*contador > 0)
+                {
+                    for(int x = y; x < *contador-1; x++)
+                    {
+                        strcpy(array_recursos[x].designacao, array_recursos[x+1].designacao);
+                        strcpy(array_recursos[x].grau_seguranca, array_recursos[x+1].grau_seguranca);
+                        strcpy(array_recursos[x].identificador, array_recursos[x+1].identificador);
+                        strcpy(array_recursos[x].ID_Recurso, array_recursos[x+1].ID_Recurso);
+                        strcpy(array_recursos[x].nome, array_recursos[x+1].nome);
+                        strcpy(array_recursos[x].tipo_recurso, array_recursos[x+1].tipo_recurso);
+
+                        array_recursos[x].designacao = array_recursos[x+1].designacao;
+                        array_recursos[x].grau_seguranca, array_recursos[x+1].grau_seguranca;
+                        array_recursos[x].identificador, array_recursos[x+1].identificador;
+                        array_recursos[x].ID_Recurso, array_recursos[x+1].ID_Recurso;
+                        array_recursos[x].nome, array_recursos[x+1].nome;
+                        array_recursos[x].tipo_recurso, array_recursos[x+1].tipo_recurso;
+                    }
+                    (*contador)--;
+                }
+                else
+                    printf("Impossivel eliminar porque você ou outro utilizador tem acessos guardados no recurso\n");
             }
         }
     }
