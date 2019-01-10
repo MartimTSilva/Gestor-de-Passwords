@@ -77,6 +77,8 @@ char ConfirmarSaida(void);
 char MenuExtras(void);
 char MenuGestorAcessos(void);
 void VerificadorPassword(t_recursos array_recursos[], int contador, char *password[]);
+
+
 int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *seq_ID_Recursos);
 void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r);
 int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_ACESSOS], int contador, int contador_r,int id_utilizador);
@@ -110,7 +112,7 @@ int main()
     t_data array_data[MAX_ACESSOS];
     t_acessos arr_acessos[MAX_ACESSOS] = {"", "", ""};
     t_recursos arr_recursos[MAX_RECURSOS] = {"", "", "", "", ""};
-    int contador_array_recursos = 0, pwd, contador_recursos = 0, confirmarLogin = -1, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos=0;
+    int contador_acessos = 0, pwd, contador_recursos = 0, confirmarLogin = -1, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos=0;
 
     int opc_register;
     t_register user_register[MAX_UTILIZADORES];
@@ -174,9 +176,9 @@ int main()
                             switch (opcao3)
                             {
                             case 'A':
-                                if (contador_array_recursos < MAX_RECURSOS) ///Para não deixar exceder o número máximo de recursos permitidos
+                                if (contador_acessos < MAX_RECURSOS) ///Para não deixar exceder o número máximo de recursos permitidos
                                 {
-                                    contador_array_recursos = InserirAcessos(arr_acessos, arr_recursos, contador_array_recursos, contador_recursos,user_register[confirmarLogin].ID_Utilizador);
+                                    contador_acessos = InserirAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos,user_register[confirmarLogin].ID_Utilizador);
                                 }
                                 else
                                 {
@@ -185,13 +187,13 @@ int main()
                                 }
                                 break;
                             case 'B':
-                                VerAcessos(arr_acessos, arr_recursos, contador_array_recursos, contador_recursos, confirmarLogin, string);
+                                VerAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos, confirmarLogin, string);
                                 break;
                             case 'C':
-                                AlterarAcessos(arr_acessos, arr_recursos, contador_array_recursos, contador_recursos, confirmarLogin);
+                                AlterarAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos, confirmarLogin);
                                 break;
                             case 'D':
-                                EliminarAcessos(arr_acessos, arr_recursos, &contador_array_recursos, contador_recursos, confirmarLogin);
+                                EliminarAcessos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
                             case 'V':
                                 break;
                             default:
@@ -226,7 +228,7 @@ int main()
                                 AlterarRecursos(arr_recursos, contador_recursos);
                                 break;
                             case 'D':
-                                EleminarRecursos(arr_acessos, arr_recursos, &contador_array_recursos, contador_recursos, confirmarLogin);
+                                EleminarRecursos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
                                 break;
                             case 'V':
                                 break;
