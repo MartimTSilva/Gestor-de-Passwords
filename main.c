@@ -231,7 +231,11 @@ int main()
                                 AlterarRecursos(arr_recursos, contador_recursos);
                                 break;
                             case 'D':
+<<<<<<< HEAD
                                 EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, &contador_recursos, confirmarLogin);
+=======
+                                EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
+>>>>>>> 127e4363338c71e25780a681fd32e90c9a6358df
                                 break;
                             case 'V':
                                 break;
@@ -242,6 +246,7 @@ int main()
                         }
                         while (opcao4 != 'V');
                         break;
+
                     case 'C':
                         if(user_register[confirmarLogin].ID_Utilizador == 0)
                         {
