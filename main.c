@@ -1523,18 +1523,12 @@ void EleminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
                     for(int x = y; x < *contador-1; x++)
                     {
                         strcpy(array_recursos[x].designacao, array_recursos[x+1].designacao);
-                        strcpy(array_recursos[x].grau_seguranca, array_recursos[x+1].grau_seguranca);
-                        strcpy(array_recursos[x].identificador, array_recursos[x+1].identificador);
-                        strcpy(array_recursos[x].ID_Recurso, array_recursos[x+1].ID_Recurso);
                         strcpy(array_recursos[x].nome, array_recursos[x+1].nome);
-                        strcpy(array_recursos[x].tipo_recurso, array_recursos[x+1].tipo_recurso);
+                        array_recursos[x].tipo_recurso = array_recursos[x+1].tipo_recurso;
+                        array_recursos[x].ID_Recurso = array_recursos[x+1].ID_Recurso;
+                        array_recursos[x].identificador = array_recursos[x+1].identificador;
+                        array_recursos[x].grau_seguranca = array_recursos[x+1].grau_seguranca;
 
-                        array_recursos[x].designacao = array_recursos[x+1].designacao;
-                        array_recursos[x].grau_seguranca, array_recursos[x+1].grau_seguranca;
-                        array_recursos[x].identificador, array_recursos[x+1].identificador;
-                        array_recursos[x].ID_Recurso, array_recursos[x+1].ID_Recurso;
-                        array_recursos[x].nome, array_recursos[x+1].nome;
-                        array_recursos[x].tipo_recurso, array_recursos[x+1].tipo_recurso;
                     }
                     (*contador)--;
                 }
@@ -1545,3 +1539,4 @@ void EleminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
     }
     getch();
 }
+
