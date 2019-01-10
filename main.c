@@ -47,7 +47,7 @@ typedef struct
     int ID_Recurso;
     int identificador;
     char nome[MAX_CARACTERES];
-    char tipo_recurso[MAX_CARACTERES];
+    int tipo_recurso;
     int grau_seguranca;
     char designacao[MAX_CARACTERES];
 } t_recursos;
@@ -593,9 +593,17 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
     {
         strcpy(array_recursos[contador].nome, nome_recurso);
         printf("\nInsira os dados\n");
-        printf("Tipo de recurso: ");
-        fflush(stdin);
-        gets(array_recursos[i].tipo_recurso);
+        do
+        {
+            printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): ");
+            fflush(stdin);
+            scanf("%d", &array_recursos[i].tipo_recurso);
+            if (array_recursos[i].tipo_recurso > 3)
+            {
+                printf("\nValor inválido\n");
+            }
+        }
+        while (array_recursos[i].tipo_recurso > 3);
         printf("Designação única (ex. www.google.pt): ");
         fflush(stdin);
         gets(array_recursos[i].designacao);
@@ -604,6 +612,10 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
             printf("Grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): ");
             fflush(stdin);
             scanf("%d", &array_recursos[i].grau_seguranca);
+            if (array_recursos[i].grau_seguranca > 3)
+            {
+                printf("\nValor inválido\n");
+            }
         }
         while (array_recursos[i].grau_seguranca <1 || array_recursos[i].grau_seguranca > 3);
         printf("\nRecurso criado com sucesso!");
@@ -649,9 +661,9 @@ void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int cont
         comparar_recursos = strcasecmp(array_recursos[i].nome, mostrar);
         if (comparar_recursos == 0)
         {
-            printf("Tipo de recurso: %s\n", array_recursos[i].tipo_recurso);
+            printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): %i\n", array_recursos[i].tipo_recurso);
             printf("Designação única: %s\n", array_recursos[i].designacao);
-            printf("Grau de segurança: %i\n", array_recursos[i].grau_seguranca);
+            printf("Grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): %i\n", array_recursos[i].grau_seguranca);
             printf("ID: %i\n", array_recursos[i].ID_Recurso);
             contador_recursos++;
         }
@@ -1214,10 +1226,18 @@ void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r)
         comparar_recursos = strcasecmp(array_recursos[i].nome, mostrar);
         if (comparar_recursos == 0)
         {
-            printf("Tipo de recurso atual: %s\n", array_recursos[i].tipo_recurso);
-            printf("Novo tipo de recurso: ");
-            fflush(stdin);
-            gets(array_recursos[i].tipo_recurso);
+            printf("Tipo de recurso atual: %i\n", array_recursos[i].tipo_recurso);
+            do
+            {
+                printf("Novo tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): ");
+                fflush(stdin);
+                scanf("%d", &array_recursos[i].tipo_recurso);
+                if (array_recursos[i].tipo_recurso > 3)
+                {
+                    printf("\nValor inválido\n");
+                }
+            }
+            while (array_recursos[i].tipo_recurso > 3);
 
             printf("Designação única atual: %s\n", array_recursos[i].designacao);
             printf("Nova designação única: ");
@@ -1230,8 +1250,12 @@ void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r)
                 printf("Novo grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): ");
                 fflush(stdin);
                 scanf("%d", &array_recursos[i].grau_seguranca);
+                if (array_recursos[i].grau_seguranca > 3)
+                {
+                    printf("\nValor inválido\n");
+                }
             }
-            while (array_recursos[i].grau_seguranca <1 || array_recursos[i].grau_seguranca > 3);
+            while (array_recursos[i].grau_seguranca < 1 || array_recursos[i].grau_seguranca > 3);
             printf("\nRecurso criado com sucesso!");
         }
     }
