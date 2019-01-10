@@ -118,6 +118,8 @@ int main()
 
     ler_ficheiro(user_register, &contador_registar);
     VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
+    printf("\ncontador: %d", contador_registar);
+
     do
     {
         do
