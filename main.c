@@ -218,7 +218,6 @@ int main()
                                 if (contador_recursos < MAX_RECURSOS) ///Para não deixar exceder o número máximo de recursos permitidos
                                 {
                                     contador_recursos = InserirRecursos(arr_recursos, contador_recursos, &seq_ID_Recursos);
-
                                 }
                                 else
                                 {
@@ -233,7 +232,7 @@ int main()
                                 AlterarRecursos(arr_recursos, contador_recursos);
                                 break;
                             case 'D':
-                                EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
+                                //EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
                                 break;
                             case 'V':
                                 break;
@@ -244,7 +243,6 @@ int main()
                         }
                         while (opcao4 != 'V');
                         break;
-
                     case 'C':
                         if(user_register[confirmarLogin].ID_Utilizador == 0)
                         {
