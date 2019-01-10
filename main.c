@@ -176,7 +176,7 @@ int main()
                             switch (opcao3)
                             {
                             case 'A':
-                                if (contador_acessos < MAX_RECURSOS) ///Para não deixar exceder o número máximo de recursos permitidos
+                                if (contador_acessos < MAX_ACESSOS) ///Para não deixar exceder o número máximo de acessos permitidos
                                 {
                                     contador_acessos = InserirAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos,user_register[confirmarLogin].ID_Utilizador);
                                 }
