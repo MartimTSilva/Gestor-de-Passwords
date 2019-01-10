@@ -58,7 +58,6 @@ void gerador_num(void);
 void gerador_letras(int quant4);
 void gerador_razovel(int quant);
 void gerador_dificil(int quant2);
-int menu_opcoes (void);
 int le_num(void);
 int gerador_nume[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
 char gerador_ltr[52] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
@@ -104,7 +103,8 @@ void AlterarUtilizadores(t_register user_register[MAX_UTILIZADORES], int contado
 void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r);
 void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r, int id_utilizador);
 void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador);
-void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador);
+void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int *contador_r, int id_utilizador);
+void EliminarUtilizadores(t_register user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_registo, int id_utilizador);
 
 t_data getdate();
 t_hour gethour();
@@ -125,8 +125,6 @@ int main()
 
     ler_ficheiro(user_register, &contador_registar);
     VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
-    printf("\ncontador: %d", contador_registar);
-
     do
     {
         do
@@ -218,6 +216,7 @@ int main()
                                 if (contador_recursos < MAX_RECURSOS) ///Para não deixar exceder o número máximo de recursos permitidos
                                 {
                                     contador_recursos = InserirRecursos(arr_recursos, contador_recursos, &seq_ID_Recursos);
+
                                 }
                                 else
                                 {
@@ -232,7 +231,7 @@ int main()
                                 AlterarRecursos(arr_recursos, contador_recursos);
                                 break;
                             case 'D':
-                                //EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
+                                EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, &contador_recursos, confirmarLogin);
                                 break;
                             case 'V':
                                 break;
@@ -361,6 +360,11 @@ int main()
                             }
                         }
                         while (opcao8 != 'V');
+                        break;
+                    case 'C':
+                        EliminarUtilizadores(user_register, arr_acessos, &contador_registar, confirmarLogin);
+                        confirmarLogin = -1;
+                        menu_opcao();
                         break;
                     case 'V':
                         break;
@@ -1368,6 +1372,7 @@ char MenuMinhaConta()
     system("cls");
     printf("\n\tA - Ver dados\n");
     printf("\tB - Alterar dados\n");
+    printf("\tC - Apagar conta\n");
     printf("\tV - Voltar\n");
     printf("\tOpção -> ");
     fflush(stdin);
@@ -1507,22 +1512,22 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
     getch();
 }
 
-/*void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador)
+void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int *contador_r, int id_utilizador)
 {
     char recurso[MAX_CARACTERES], mostrar[MAX_CARACTERES], password[MAX_CARACTERES], confirm;
     int encontrado;
 
     printf("Indique o nome do recurso que pretende eliminar: ");
-    gets(recurso);
+    scanf("%s", recurso);
 
-    for(int i = 0; i < contador_r; i++)
+    for(int i = 0; i < *contador_r; i++)
     {
         encontrado = strcasecmp(array_recursos[i].nome, recurso);
         if (encontrado == 0)
         {
-            if (*contador_a > 0)
+            if (array_acessos[i].id_recurso != i) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
             {
-                for(int x = ; x < *contador_r-1; x++)
+                for(int x = i; x < *contador_r-1; x++)
                 {
                     strcpy(array_recursos[x].designacao, array_recursos[x+1].designacao);
                     strcpy(array_recursos[x].nome, array_recursos[x+1].nome);
@@ -1539,4 +1544,25 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
     }
     getch();
 }
-*/
+
+void EliminarUtilizadores(t_register user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_registo, int id_utilizador)
+{
+    for(int i = 0; i < *contador_registo; i++)
+    {
+        if (array_acessos[i].id_utilizador != id_utilizador) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
+        {
+            for(int x = i; x < *contador_registo-1; x++)
+            {
+                user_registo[x].ID_Utilizador = user_registo[x+1].ID_Utilizador;
+                strcpy(user_registo[x].nome, user_registo[x+1].nome);
+                strcpy(user_registo[x].password_register, user_registo[x+1].password_register);
+                strcpy(user_registo[x].username_login, user_registo[x+1].username_login);
+                strcpy(user_registo[x].username_register, user_registo[x+1].username_register);
+                user_registo[x].NIC_register = user_registo[x+1].NIC_register;
+            }
+            (*contador_registo)--;
+        }
+        else
+            printf("Impossivel eliminar porque você tem acessos guardados\n");
+    }
+}
