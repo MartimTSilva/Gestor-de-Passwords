@@ -309,7 +309,6 @@ int main()
                 }
                 while(opcao5 != 'V');
                 break;
-
             case 'C':
                 ler_ficheiro(user_register, &contador_registar);
                 break;
@@ -1439,7 +1438,6 @@ void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int conta
         do
         {
             printf("\n\t  Numero de identificação civil: ");
-
             fflush(stdin);
             scanf("%i", &NIC);
             if(NIC < 11111111 || NIC > 99999999)
@@ -1464,41 +1462,38 @@ void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int conta
     while(NIC > 11111111 && NIC < 99999999 && existe==1);
     user_registo[contador].NIC_register = NIC;
 }
+
 void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador)
 {
     char login[MAX_CARACTERES], mostrar[MAX_CARACTERES], password[MAX_CARACTERES], confirm;
     int encontrado, encontrado2;
 
     VerAcessos(array_acessos, array_recursos, *contador, contador_r, id_utilizador, mostrar);
-    printf("Indique o LOGIN ATUAL do acesso que pretende eliminar: ");
+    printf("Indique o LOGIN DO ACESSO que pretende eliminar: ");
     gets(login);
 
     for(int i = 0; i < contador_r; i++)
     {
         encontrado = strcasecmp(array_recursos[i].nome, mostrar);
+        printf("\narray_recursos[i].nome: %s\n\n", array_recursos[i].nome);
         if (encontrado == 0)
         {
-            printf("Var I: %d", i);
             for (int y = 0; y < *contador; y++)
             {
                 encontrado2 = strcasecmp(array_acessos[y].login, login);
                 if (encontrado2 == 0 && array_acessos[y].id_utilizador == id_utilizador)
                 {
-                    printf("Var Y: %d", y);
-                    for(int x = 0; x< y; x++)
+                    for(int x = y; x < *contador-1; x++)
                     {
-                        printf("Var x: %d", x);
                         strcpy(array_acessos[x].login, array_acessos[x+1].login);
                         strcpy(array_acessos[x].nome, array_acessos[x+1].nome);
-                        //strcpy(array_acessos[x].password, array_acessos[x+1].password);
-                        strcpy(array_acessos[x].password, "DELETE");
+                        strcpy(array_acessos[x].password, array_acessos[x+1].password);
                         array_acessos[x].id_recurso=array_acessos[x+1].id_recurso;
                         array_acessos[x].id_utilizador=array_acessos[x+1].id_utilizador;
                         array_acessos[x].data=array_acessos[x+1].data;
                         array_acessos[x].hora=array_acessos[x+1].hora;
-
                     }
-                    //(*contador)--;
+                    (*contador)--;
                 }
             }
         }
