@@ -66,8 +66,8 @@ char gerador_espec[18] = { '_', '.', '-', '$', '/', '&', '(', ')', '[', ']', '?'
 
 
 int menu_opcao(void);
-int login (t_register user_registo[MAX_UTILIZADORES],int contador);
-int registar (t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_ID_Utlizador);
+int login (t_register user_registo[MAX_UTILIZADORES],int contador_registo);
+int registar (t_register user_registo[MAX_UTILIZADORES], int contador_registo, int *seq_ID_Utlizador);
 char menuPrincipal(void);
 char MenuGestor(void);
 void MenuSobre(void);
@@ -76,30 +76,35 @@ char MenuGestorRecursos(void);
 char ConfirmarSaida(void);
 char MenuExtras(void);
 char MenuGestorAcessos(void);
-void VerificadorPassword(t_recursos array_recursos[], int contador, char *password[]);
+void VerificadorPassword(t_recursos array_recursos[], int contador_r, char *password[]);
 
 
-int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *seq_ID_Recursos);
-void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r);
-int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_ACESSOS], int contador, int contador_r,int id_utilizador);
-void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador, char mostrar[MAX_CARACTERES]);
-void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, int ID_Utilizador);
-int InserirAdmin(t_register user_registo[MAX_UTILIZADORES], int contador);
-void ler_ficheiro(t_register user_register[], int *contador);
-void guardar_ficheiro(t_register user_register[], int contador);
+int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r, int *seq_ID_Recursos);
+void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r);
 
 
-void AlterarUtilizadoresNome(t_register user_registo[MAX_UTILIZADORES], int contador);
-void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int contador);
-void AlterarUtilizadoresPasswords(t_register user_registo[MAX_UTILIZADORES], int contador);
-void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int contador);
+int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_ACESSOS], int contador_a, int contador_r, int id_utilizador);
+void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r, int id_utilizador, char mostrar[MAX_CARACTERES]);
+
+
+void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador_registo, int ID_Utilizador);
+int InserirAdmin(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
+void ler_ficheiro(t_register user_register[], int *contador_registo);
+void guardar_ficheiro(t_register user_register[], int contador_registo);
+
+
+void AlterarUtilizadoresNome(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
+void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
+void AlterarUtilizadoresPasswords(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
+void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
 char MenuMinhaConta();
 char MenuAlterarUtilizadores();
-void AlterarUtilizadores(t_register user_register[MAX_UTILIZADORES], int contador);
+void AlterarUtilizadores(t_register user_register[MAX_UTILIZADORES], int contador_registo);
+
 void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r);
-void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador);
-void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador);
-void EleminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador);
+void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r, int id_utilizador);
+void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador);
+void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador);
 
 t_data getdate();
 t_hour gethour();
@@ -178,7 +183,7 @@ int main()
                             case 'A':
                                 if (contador_acessos < MAX_ACESSOS) ///Para não deixar exceder o número máximo de acessos permitidos
                                 {
-                                    contador_acessos = InserirAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos,user_register[confirmarLogin].ID_Utilizador);
+                                    contador_acessos = InserirAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos, user_register[confirmarLogin].ID_Utilizador);
                                 }
                                 else
                                 {
@@ -228,7 +233,7 @@ int main()
                                 AlterarRecursos(arr_recursos, contador_recursos);
                                 break;
                             case 'D':
-                                EleminarRecursos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
+                                EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
                                 break;
                             case 'V':
                                 break;
@@ -571,7 +576,7 @@ char ConfirmarSaida(void)
 }
 
 
-int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *seq_ID_Recursos)
+int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r, int *seq_ID_Recursos)
 {
     char nome_recurso[MAX_CARACTERES];
     int encontrado, i;
@@ -580,7 +585,7 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
     printf("\nIndique o nome do novo recurso: ");
     scanf(" %s", nome_recurso);
 
-    for(i = 0; i < contador; i++)
+    for(i = 0; i < contador_r; i++)
     {
 
         encontrado = strcasecmp(array_recursos[i].nome, nome_recurso);
@@ -588,13 +593,13 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
         {
             printf("Já tem um recurso criado com esse nome.");
             getch();
-            return contador;
+            return contador_r;
         }
     }
 
-    if (i == contador && encontrado != 0)
+    if (i == contador_r && encontrado != 0)
     {
-        strcpy(array_recursos[contador].nome, nome_recurso);
+        strcpy(array_recursos[contador_r].nome, nome_recurso);
         printf("\nInsira os dados\n");
         do
         {
@@ -622,28 +627,28 @@ int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int *
         }
         while (array_recursos[i].grau_seguranca <1 || array_recursos[i].grau_seguranca > 3);
         printf("\nRecurso criado com sucesso!");
-        contador+=1;
+        contador_r+=1;
     }
     printf("\n______________________________________________________________________\n\n");
 
     array_recursos[i].ID_Recurso = *seq_ID_Recursos;
     (*seq_ID_Recursos)++;
     getch();
-    return contador;
+    return contador_r;
 }
 
 
-void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r)
+void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r)
 {
     char mostrar[MAX_CARACTERES];
     int i = 0, contador_recursos=0,comparar_recursos;
 
-    if (contador != 0)
+    if (contador_a != 0)
     {
         printf("______________________________________________________________________\n\n");
         printf("Todos os os recursos guardados:\n\n");
 
-        for(int i = 0; i < contador; i++ )  ///Ver a lista de contas
+        for(int i = 0; i < contador_r; i++ )  ///Ver a lista de contas
         {
             printf("%i - %s\n", i+1, array_recursos[i].nome); ///i+1 para a lista dos recursos não começar em 0
         }
@@ -685,7 +690,7 @@ void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador, int cont
 }
 
 
-void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador, char mostrar[MAX_CARACTERES])
+void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r, int id_utilizador, char mostrar[MAX_CARACTERES])
 {
     int i = 0, encontrado=99, contador_acessos=0, contador_recursos=0,comparar_recursos, posicao_acesso;
 
@@ -713,7 +718,7 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
         return;
     }
 
-    for(i = 0; i < contador; i++)
+    for(i = 0; i < contador_a; i++)
     {
         encontrado = strcasecmp(array_acessos[i].nome, mostrar);
         if (encontrado == 0 && array_acessos[i].id_utilizador == id_utilizador)
@@ -735,7 +740,7 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
 }
 
 
-int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_ACESSOS], int contador, int contador_r,int id_utilizador)
+int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_ACESSOS], int contador_a, int contador_r, int id_utilizador)
 {
     char mostrar[MAX_CARACTERES], password[MAX_CARACTERES];
     int encontrado=1;
@@ -751,22 +756,22 @@ int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recurs
         encontrado = strcasecmp(array_recursos[i].nome, mostrar);
         if (encontrado == 0)
         {
-            strcpy(array_acessos[contador].nome, mostrar);
+            strcpy(array_acessos[contador_a].nome, mostrar);
             printf("\nInsira os seus dados\n\n");
             printf("Login: ");
-            scanf(" %s", array_acessos[contador].login);
-            array_acessos[contador].id_utilizador=id_utilizador;
-            array_acessos[contador].id_recurso=array_recursos[i].ID_Recurso;
+            scanf(" %s", array_acessos[contador_a].login);
+            array_acessos[contador_a].id_utilizador=id_utilizador;
+            array_acessos[contador_a].id_recurso=array_recursos[i].ID_Recurso;
 
 
             VerificadorPassword(array_recursos, i, &password);
-            strcpy(array_acessos[contador].password, password);
+            strcpy(array_acessos[contador_a].password, password);
 
 
-            array_acessos[contador].hora = gethour();
-            array_acessos[contador].data = getdate();
+            array_acessos[contador_a].hora = gethour();
+            array_acessos[contador_a].data = getdate();
 
-            contador += 1;
+            contador_a += 1;
             printf("\nAcesso adicionado com sucesso!");
             break;
         }
@@ -778,15 +783,15 @@ int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recurs
     }
     printf("\n______________________________________________________________________\n\n");
     getch();
-    return contador;
+    return contador_a;
 }
 
 
-void VerificadorPassword(t_recursos array_recursos[], int contador, char *password[])
+void VerificadorPassword(t_recursos array_recursos[], int contador_r, char *password[])
 {
     int espec=0,maiusc=0,minusc=0, num=0,i=0, tamanho;
     char verificar_password[25];
-    if (array_recursos[contador].grau_seguranca == 3)
+    if (array_recursos[contador_r].grau_seguranca == 3)
     {
         printf("\nEscolheu o grau de segurança máximo para este recurso, por isso a sua password tem que ter:\n");
         printf("Pelo menos 8 caracteres, um número, um caracter especial, uma letra maiúscula e minúscula.\n\n");
@@ -841,7 +846,7 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
     }
 
 
-    if (array_recursos[contador].grau_seguranca == 2)
+    if (array_recursos[contador_r].grau_seguranca == 2)
     {
         printf("\nEscolheu o grau de segurança médio para este recurso, por isso a sua password tem que ter:\n");
         printf("Pelo menos 8 caracteres, um número, uma letra maiúscula e minúscula.\n\n");
@@ -875,7 +880,7 @@ void VerificadorPassword(t_recursos array_recursos[], int contador, char *passwo
     }
 
 
-    if (array_recursos[contador].grau_seguranca == 1)
+    if (array_recursos[contador_r].grau_seguranca == 1)
     {
         printf("\nEscolheu o grau de segurança baixo para este recurso, por isso pode ser o que quiser:\n");
         printf("\nPassword: ");
@@ -1029,7 +1034,7 @@ int menu_opcao(void)
 }
 
 
-int login(t_register user_registo[MAX_UTILIZADORES],int contador)
+int login(t_register user_registo[MAX_UTILIZADORES],int contador_registo)
 {
     char username_login[MAX_CARACTERES];
     char password_login[MAX_CARACTERES];
@@ -1045,7 +1050,7 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
     fflush(stdin);
     scanf("%s",password_login);
 
-    for(i = 0; i < contador ; i++)
+    for(i = 0; i < contador_registo ; i++)
     {
         if((strcmp(user_registo[i].username_register,username_login)==0) && (strcmp(user_registo[i].password_register,password_login)==0))
         {
@@ -1068,7 +1073,7 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador)
 }
 
 
-int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_ID_Utlizador)
+int registar(t_register user_registo[MAX_UTILIZADORES], int contador_registo, int *seq_ID_Utlizador)
 {
     int i, NIC, existe = 0;
     char utilizador[MAX_CARACTERES];
@@ -1082,7 +1087,7 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
             fflush(stdin);
             gets(utilizador);
 
-            for(i = 0; i < contador ; i++)
+            for(i = 0; i < contador_registo ; i++)
 
             {
                 if (strcmp(user_registo[i].username_register, utilizador)==0)
@@ -1110,7 +1115,7 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
                 }
             }
             while(NIC < 11111111 || NIC > 99999999);
-            for(i=0; i< contador; i++)
+            for(i=0; i< contador_registo; i++)
             {
                 if (user_registo[i].NIC_register==NIC)
                 {
@@ -1126,30 +1131,30 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador, int *seq_I
         while(NIC > 11111111 && NIC < 99999999 && existe==1);
 
     }
-    while(strcmp(user_registo[i].username_register, utilizador)==0 && user_registo[contador].NIC_register==NIC);
+    while(strcmp(user_registo[i].username_register, utilizador)==0 && user_registo[contador_registo].NIC_register==NIC);
 
     printf("\n\t  Password: ");
     fflush(stdin);
-    scanf("%s", user_registo[contador].password_register);
+    scanf("%s", user_registo[contador_registo].password_register);
     printf("\n\t  Introduza o seu nome pessoal: ");
     fflush(stdin);
-    gets(user_registo[contador].nome);
-    strcpy(user_registo[contador].username_register, utilizador);
-    user_registo[contador].NIC_register = NIC;
+    gets(user_registo[contador_registo].nome);
+    strcpy(user_registo[contador_registo].username_register, utilizador);
+    user_registo[contador_registo].NIC_register = NIC;
     printf("\n\t  Registo efetuado com sucesso.\n\n");
     printf("\t|============================================================|\n");
     (*seq_ID_Utlizador)++;
-    user_registo[contador].ID_Utilizador = *seq_ID_Utlizador;
+    user_registo[contador_registo].ID_Utilizador = *seq_ID_Utlizador;
     getch();
 
-    return contador+1;
+    return contador_registo+1;
 }
 
-void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, int ID_Utilizador)
+void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador_registo, int ID_Utilizador)
 {
     int i;
     system("cls");
-    for (i = 0; i < contador; i++)
+    for (i = 0; i < contador_registo; i++)
     {
         printf("\n\tNome: %s\n", user_register[i].nome);
         printf("\tUsername: %s\n", user_register[i].username_register);
@@ -1162,16 +1167,16 @@ void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador, in
     getch();
 }
 
-int InserirAdmin(t_register user_register[MAX_UTILIZADORES], int contador)
+int InserirAdmin(t_register user_register[MAX_UTILIZADORES], int contador_registo)
 {
-    user_register[contador].ID_Utilizador=0;
-    user_register[contador].NIC_register=999999999;
-    strcpy(user_register[contador].username_register, "admin");
-    strcpy(user_register[contador].password_register, "admin");
-    return contador+1;
+    user_register[contador_registo].ID_Utilizador=0;
+    user_register[contador_registo].NIC_register=999999999;
+    strcpy(user_register[contador_registo].username_register, "admin");
+    strcpy(user_register[contador_registo].password_register, "admin");
+    return contador_registo+1;
 }
 
-void ler_ficheiro(t_register user_register[], int *contador)
+void ler_ficheiro(t_register user_register[], int *contador_registo)
 {
     int n_elementos, n_elementos_lidos;
     FILE *ficheiro;
@@ -1193,12 +1198,12 @@ void ler_ficheiro(t_register user_register[], int *contador)
         else
         {
             printf("\nA LER...\n\n");
-            (*contador) = n_elementos;
+            (*contador_registo) = n_elementos;
         }
     }
 }
 
-void guardar_ficheiro(t_register user_register[], int contador)
+void guardar_ficheiro(t_register user_register[], int contador_registo)
 {
     FILE *ficheiro;
     ficheiro = fopen("dados.dat", "wb");
@@ -1208,8 +1213,8 @@ void guardar_ficheiro(t_register user_register[], int contador)
     }
     else
     {
-        fwrite(&contador, sizeof(int), 1, ficheiro);
-        fwrite(user_register, sizeof(t_register), contador, ficheiro);
+        fwrite(&contador_registo, sizeof(int), 1, ficheiro);
+        fwrite(user_register, sizeof(t_register), contador_registo, ficheiro);
         fclose(ficheiro);
     }
 }
@@ -1264,12 +1269,12 @@ void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r)
     }
 }
 
-void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador, int contador_r, int id_utilizador)
+void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r, int id_utilizador)
 {
     char login[MAX_CARACTERES], mostrar[MAX_CARACTERES], password[MAX_CARACTERES];
     int encontrado, encontrado2;
 
-    VerAcessos(array_acessos, array_recursos, contador, contador_r, id_utilizador, mostrar);
+    VerAcessos(array_acessos, array_recursos, contador_a, contador_r, id_utilizador, mostrar);
     printf("Indique o LOGIN ATUAL do acesso que pretende alterar ou eleminar: ");
     gets(login);
 
@@ -1278,7 +1283,7 @@ void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recur
         encontrado = strcasecmp(array_recursos[i].nome, mostrar);
         if (encontrado == 0)
         {
-            for (int i = 0; i < contador; i++)
+            for (int i = 0; i < contador_a; i++)
             {
                 encontrado2 = strcasecmp(array_acessos[i].login, login);
                 if (encontrado2 == 0 && array_acessos[i].id_utilizador == id_utilizador)
@@ -1390,16 +1395,16 @@ char MenuAlterarUtilizadores()
     return opcao8;
 }
 
-void AlterarUtilizadoresNome(t_register user_registo[MAX_UTILIZADORES], int contador)
+void AlterarUtilizadoresNome(t_register user_registo[MAX_UTILIZADORES], int contador_registo)
 {
     printf("\n\tInsira o novo nome: ");
     fflush(stdin);
-    gets(user_registo[contador].nome);
+    gets(user_registo[contador_registo].nome);
     printf("\tNome guardado com sucesso!");
     getch();
 }
 
-void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int contador)
+void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int contador_registo)
 {
     int i;
     char utilizador[MAX_CARACTERES];
@@ -1409,7 +1414,7 @@ void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int con
         fflush(stdin);
         gets(utilizador);
 
-        for( i = 0; i < contador ; i++)
+        for( i = 0; i < contador_registo ; i++)
 
         {
             if (strcmp(user_registo[i].username_register, utilizador)==0)
@@ -1422,19 +1427,19 @@ void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int con
         }
     }
     while (utilizador != "admin" && strcmp(user_registo[i].username_register, utilizador)==0);
-    strcpy(user_registo[contador].username_register, utilizador);
+    strcpy(user_registo[contador_registo].username_register, utilizador);
 }
 
-void AlterarUtilizadoresPasswords(t_register user_registo[MAX_UTILIZADORES], int contador)
+void AlterarUtilizadoresPasswords(t_register user_registo[MAX_UTILIZADORES], int contador_registo)
 {
     printf("\n\tInsira a nova password: ");
     fflush(stdin);
-    scanf("%s", user_registo[contador].password_register);
+    scanf("%s", user_registo[contador_registo].password_register);
     printf("\tPassword guardada com sucesso!");
     getch();
 }
 
-void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int contador)
+void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int contador_registo)
 {
     int i, NIC, existe;
     do
@@ -1450,7 +1455,7 @@ void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int conta
             }
         }
         while(NIC < 11111111 || NIC > 99999999);
-        for(i=0; i< contador; i++)
+        for(i=0; i< contador_registo; i++)
         {
             if (user_registo[i].NIC_register==NIC)
             {
@@ -1464,15 +1469,15 @@ void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int conta
         }
     }
     while(NIC > 11111111 && NIC < 99999999 && existe==1);
-    user_registo[contador].NIC_register = NIC;
+    user_registo[contador_registo].NIC_register = NIC;
 }
 
-void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador)
+void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador)
 {
     char login[MAX_CARACTERES], mostrar[MAX_CARACTERES], password[MAX_CARACTERES], confirm;
     int encontrado, encontrado2;
 
-    VerAcessos(array_acessos, array_recursos, *contador, contador_r, id_utilizador, mostrar);
+    VerAcessos(array_acessos, array_recursos, *contador_a, contador_r, id_utilizador, mostrar);
     printf("Indique o LOGIN DO ACESSO que pretende eliminar: ");
     gets(login);
 
@@ -1481,12 +1486,12 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
         encontrado = strcasecmp(array_recursos[i].nome, mostrar);
         if (encontrado == 0)
         {
-            for (int y = 0; y < *contador; y++)
+            for (int y = 0; y < *contador_a; y++)
             {
                 encontrado2 = strcasecmp(array_acessos[y].login, login);
                 if (encontrado2 == 0 && array_acessos[y].id_utilizador == id_utilizador)
                 {
-                    for(int x = y; x < *contador-1; x++)
+                    for(int x = y; x < *contador_a-1; x++)
                     {
                         strcpy(array_acessos[x].login, array_acessos[x+1].login);
                         strcpy(array_acessos[x].nome, array_acessos[x+1].nome);
@@ -1496,7 +1501,7 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
                         array_acessos[x].data=array_acessos[x+1].data;
                         array_acessos[x].hora=array_acessos[x+1].hora;
                     }
-                    (*contador)--;
+                    (*contador_a)--;
                 }
             }
         }
@@ -1504,12 +1509,11 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
     getch();
 }
 
-void EleminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador, int contador_r, int id_utilizador)
+/*void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador)
 {
     char recurso[MAX_CARACTERES], mostrar[MAX_CARACTERES], password[MAX_CARACTERES], confirm;
     int encontrado;
 
-    VerAcessos(array_acessos, array_recursos, *contador, contador_r, id_utilizador, recurso);
     printf("Indique o nome do recurso que pretende eliminar: ");
     gets(recurso);
 
@@ -1518,27 +1522,23 @@ void EleminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
         encontrado = strcasecmp(array_recursos[i].nome, recurso);
         if (encontrado == 0)
         {
-            for (int y = 0; y < *contador; y++)
+            if (*contador_a > 0)
             {
-                if (*contador > 0)
+                for(int x = ; x < *contador_r-1; x++)
                 {
-                    for(int x = y; x < *contador-1; x++)
-                    {
-                        strcpy(array_recursos[x].designacao, array_recursos[x+1].designacao);
-                        strcpy(array_recursos[x].nome, array_recursos[x+1].nome);
-                        array_recursos[x].tipo_recurso = array_recursos[x+1].tipo_recurso;
-                        array_recursos[x].ID_Recurso = array_recursos[x+1].ID_Recurso;
-                        array_recursos[x].identificador = array_recursos[x+1].identificador;
-                        array_recursos[x].grau_seguranca = array_recursos[x+1].grau_seguranca;
-
-                    }
-                    (*contador)--;
+                    strcpy(array_recursos[x].designacao, array_recursos[x+1].designacao);
+                    strcpy(array_recursos[x].nome, array_recursos[x+1].nome);
+                    array_recursos[x].tipo_recurso = array_recursos[x+1].tipo_recurso;
+                    array_recursos[x].ID_Recurso = array_recursos[x+1].ID_Recurso;
+                    array_recursos[x].identificador = array_recursos[x+1].identificador;
+                    array_recursos[x].grau_seguranca = array_recursos[x+1].grau_seguranca;
                 }
-                else
-                    printf("Impossivel eliminar porque você ou outro utilizador tem acessos guardados no recurso\n");
+                (*contador_r)--;
             }
+            else
+                printf("Impossivel eliminar porque você ou outro utilizador tem acessos guardados no recurso\n");
         }
     }
     getch();
 }
-
+*/
