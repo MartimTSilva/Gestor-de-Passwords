@@ -11,11 +11,10 @@
 typedef struct  ///REGISTER
 {
     char nome[MAX_CARACTERES];
-    char username_login;
     int ID_Utilizador;
     int NIC_register;
-    char username_register[20];
-    char password_register[20];
+    char username_register[MAX_CARACTERES];
+    char password_register[MAX_CARACTERES];
 } t_register;
 
 typedef struct
@@ -66,7 +65,6 @@ char gerador_espec[18] = { '_', '.', '-', '$', '/', '&', '(', ')', '[', ']', '?'
 
 int menu_opcao(void);
 int login (t_register user_registo[MAX_UTILIZADORES],int contador_registo);
-int registar (t_register user_registo[MAX_UTILIZADORES], int contador_registo, int *seq_ID_Utlizador);
 char menuPrincipal(void);
 char MenuGestor(void);
 void MenuSobre(void);
@@ -89,8 +87,8 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
 
 void VerUtilizadores(t_register user_register[MAX_UTILIZADORES],int contador_registo, int ID_Utilizador);
 int InserirAdmin(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
-void ler_ficheiro(t_register user_register[], int *contador_registo);
-void guardar_ficheiro(t_register user_register[], int contador_registo);
+void ler_ficheiro(t_register user_register[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int *contador_registo, int *contador_r, int *contador_a);
+void guardar_ficheiro(t_register user_register[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_registo, int contador_r, int contador_a);
 
 
 void AlterarUtilizadoresNome(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
@@ -121,7 +119,7 @@ int main()
     t_register user_register[MAX_UTILIZADORES];
     contador_registar = InserirAdmin(user_register, contador_registar);
 
-    ler_ficheiro(user_register, &contador_registar);
+    ler_ficheiro(user_register, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
     VerUtilizadores(user_register, contador_registar, &seq_ID_Utlizador);
     do
     {
@@ -139,6 +137,10 @@ int main()
                 {
                     confirmarLogin=-1;
                     contador_registar=registar(user_register, contador_registar, &seq_ID_Utlizador);
+                    for(int i = 0; i< contador_registar; i++){
+                        printf("USER: %s", user_register[i].username_register);
+                    }
+                    getch();
                 }
                 else
                 {
@@ -315,10 +317,10 @@ int main()
                 while(opcao5 != 'V');
                 break;
             case 'C':
-                ler_ficheiro(user_register, &contador_registar);
+                ler_ficheiro(user_register, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
                 break;
             case 'D':
-                guardar_ficheiro(user_register, contador_registar);
+                guardar_ficheiro(user_register, arr_recursos, arr_acessos,contador_registar, contador_recursos, contador_acessos);
                 break;
             case 'E':
                 do
@@ -361,7 +363,12 @@ int main()
                         while (opcao8 != 'V');
                         break;
                     case 'C':
+                        for(int i = 0; i < contador_registar; i++)
+                        {
+                            printf("\nUsername: %s\n", user_register[i].username_register);
+                        }
                         EliminarUtilizadores(user_register, arr_acessos, &contador_registar, confirmarLogin, contador_acessos);
+
                         break;
                     case 'V':
                         break;
@@ -1070,7 +1077,7 @@ int login(t_register user_registo[MAX_UTILIZADORES],int contador_registo)
 
 int registar(t_register user_registo[MAX_UTILIZADORES], int contador_registo, int *seq_ID_Utlizador)
 {
-    int i, NIC, existe = 0;
+    int i, NIC, existe = 0, utilizador_existe=0;
     char utilizador[MAX_CARACTERES];
     system("cls");
     printf("\n\t|========================| REGISTAR |========================|\n");
@@ -1079,8 +1086,8 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador_registo, in
         do
         {
             printf("\n\t  Username: ");
-            fflush(stdin);
-            gets(utilizador);
+            scanf(" %s", utilizador);
+            printf("UTILIZADOR %s", utilizador);
 
             for(i = 0; i < contador_registo ; i++)
 
@@ -1088,14 +1095,15 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador_registo, in
                 if (strcmp(user_registo[i].username_register, utilizador)==0)
                 {
                     printf("\n\t  Esse nome de utilizador já existe.\n");
+                    utilizador_existe = 1;
                     getch();
                     break;
                 }
 
             }
         }
-        while (utilizador != "admin" && strcmp(user_registo[i].username_register, utilizador)==0);
-
+        while (utilizador != "admin" && utilizador_existe != 0);
+        printf("UTILIZADOR %s", utilizador);
         do
         {
             do
@@ -1135,13 +1143,13 @@ int registar(t_register user_registo[MAX_UTILIZADORES], int contador_registo, in
     fflush(stdin);
     gets(user_registo[contador_registo].nome);
     strcpy(user_registo[contador_registo].username_register, utilizador);
+    printf("UTILIZADOR %s", user_registo[contador_registo].username_register);
     user_registo[contador_registo].NIC_register = NIC;
     printf("\n\t  Registo efetuado com sucesso.\n\n");
     printf("\t|============================================================|\n");
     (*seq_ID_Utlizador)++;
     user_registo[contador_registo].ID_Utilizador = *seq_ID_Utlizador;
     getch();
-
     return contador_registo+1;
 }
 
@@ -1171,7 +1179,7 @@ int InserirAdmin(t_register user_register[MAX_UTILIZADORES], int contador_regist
     return contador_registo+1;
 }
 
-void ler_ficheiro(t_register user_register[], int *contador_registo)
+void ler_ficheiro(t_register user_register[MAX_UTILIZADORES], t_recursos array_acessos[MAX_ACESSOS], t_acessos array_recursos[MAX_RECURSOS], int *contador_registo, int *contador_r, int *contador_a)
 {
     int n_elementos, n_elementos_lidos;
     FILE *ficheiro;
@@ -1185,6 +1193,12 @@ void ler_ficheiro(t_register user_register[], int *contador_registo)
     {
         fread(&n_elementos, sizeof(int), 1, ficheiro);
         n_elementos_lidos = fread(user_register, sizeof(t_register), n_elementos, ficheiro);
+
+        fread(&n_elementos, sizeof(int), 1, ficheiro);
+        n_elementos_lidos = fread(array_recursos, sizeof(t_recursos), n_elementos, ficheiro);
+
+        fread(&n_elementos, sizeof(int), 1, ficheiro);
+        n_elementos_lidos = fread(array_recursos, sizeof(t_acessos), n_elementos, ficheiro);
         if (n_elementos_lidos != n_elementos)
         {
             printf("Impossivel ler o ficheiro\n\n");
@@ -1198,7 +1212,7 @@ void ler_ficheiro(t_register user_register[], int *contador_registo)
     }
 }
 
-void guardar_ficheiro(t_register user_register[], int contador_registo)
+void guardar_ficheiro(t_register user_register[MAX_UTILIZADORES], t_recursos array_acessos[MAX_ACESSOS], t_acessos array_recursos[MAX_RECURSOS], int contador_registo, int contador_r, int contador_a)
 {
     FILE *ficheiro;
     ficheiro = fopen("dados.dat", "wb");
@@ -1209,10 +1223,17 @@ void guardar_ficheiro(t_register user_register[], int contador_registo)
     else
     {
         fwrite(&contador_registo, sizeof(int), 1, ficheiro);
+        fwrite(&contador_r, sizeof(int), 1, ficheiro);
+        fwrite(&contador_a, sizeof(int), 1, ficheiro);
+
         fwrite(user_register, sizeof(t_register), contador_registo, ficheiro);
+        fwrite(array_recursos, sizeof(t_recursos), contador_r, ficheiro);
+        fwrite(array_acessos, sizeof(t_acessos), contador_a, ficheiro);
+
         fclose(ficheiro);
     }
 }
+
 
 void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r)
 {
@@ -1435,7 +1456,6 @@ void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int con
                 getch();
                 break;
             }
-
         }
     }
     while (utilizador != "admin" && strcmp(user_registo[i].username_register, utilizador)==0);
@@ -1554,20 +1574,20 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
     getch();
 }
 
-void EliminarUtilizadores(t_register user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_registo, int id_utilizador, int contador_a)
+void EliminarUtilizadores(t_register user_register[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_registo, int id_utilizador, int contador_a)
 {
     char utilizador_a_eliminar[MAX_CARACTERES];
-    int encontrado = -1, i;
+    int encontrado = -1, i, eliminar=1;
 
-    if(user_registo[id_utilizador].ID_Utilizador == 0) ///Vê se é administrador
+    if(user_register[id_utilizador].ID_Utilizador == 0) ///Vê se é administrador
     {
         printf("\n\tIntroduza o nome do utilizador que pretende eliminar: ");
         scanf("%s", utilizador_a_eliminar);
         for(i = 0; i < *contador_registo; i++)
         {
-            printf("\n1encontrado: %i\n", encontrado);
+            printf("\ndude: %s\n", user_register[i].username_register);
             getch();
-            if(strcasecmp(user_registo[i].username_login, utilizador_a_eliminar)==0)
+            if(strcasecmp(user_register[i].username_register, utilizador_a_eliminar)==0)
             {
                 encontrado=i;
                 i=(*contador_registo);
@@ -1580,24 +1600,25 @@ void EliminarUtilizadores(t_register user_registo[MAX_UTILIZADORES], t_acessos a
         {
             for (int y = 0 ; y < contador_a ; y++)
             {
-                if (array_acessos[y].id_utilizador != user_registo[i].ID_Utilizador) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
+                if (array_acessos[y].id_utilizador == user_register[i].ID_Utilizador) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
                 {
                     printf("Impossivel eliminar porque você tem acessos guardados\n");
+                    eliminar = 0;
                     getch();
                 }
-                else
+            }
+
+            if(eliminar = 1)
+            {
+                for(int x = i; x < *contador_registo-1; x++)
                 {
-                    for(int x = i; x < *contador_registo-1; x++)
-                    {
-                        user_registo[x].ID_Utilizador = user_registo[x+1].ID_Utilizador;
-                        strcpy(user_registo[x].nome, user_registo[x+1].nome);
-                        strcpy(user_registo[x].password_register, user_registo[x+1].password_register);
-                        strcpy(user_registo[x].username_login, user_registo[x+1].username_login);
-                        strcpy(user_registo[x].username_register, user_registo[x+1].username_register);
-                        user_registo[x].NIC_register = user_registo[x+1].NIC_register;
-                    }
-                    (*contador_registo)--;
+                    user_register[x].ID_Utilizador = user_register[x+1].ID_Utilizador;
+                    strcpy(user_register[x].nome, user_register[x+1].nome);
+                    strcpy(user_register[x].password_register, user_register[x+1].password_register);
+                    strcpy(user_register[x].username_register, user_register[x+1].username_register);
+                    user_register[x].NIC_register = user_register[x+1].NIC_register;
                 }
+                (*contador_registo)--;
             }
         }
         else
