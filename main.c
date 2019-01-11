@@ -76,7 +76,8 @@ char ConfirmarSaida(void);
 char MenuExtras(void);
 char MenuGestorAcessos(void);
 void VerificadorPassword(t_recursos array_recursos[], int contador_r, char *password[]);
-
+char MenuMinhaConta();
+char MenuAlterarUtilizadores();
 
 int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r, int *seq_ID_Recursos);
 void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r);
@@ -96,15 +97,12 @@ void AlterarUtilizadoresNome(t_register user_registo[MAX_UTILIZADORES], int cont
 void AlterarUtilizadoresLogin(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
 void AlterarUtilizadoresPasswords(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
 void AlterarUtilizadoresNIC(t_register user_registo[MAX_UTILIZADORES], int contador_registo);
-char MenuMinhaConta();
-char MenuAlterarUtilizadores();
 void AlterarUtilizadores(t_register user_register[MAX_UTILIZADORES], int contador_registo);
-
 void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r);
 void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r, int id_utilizador);
 void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador);
 void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int *contador_r, int id_utilizador);
-void EliminarUtilizadores(t_register user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_registo, int id_utilizador);
+void EliminarUtilizadores(t_register user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_registo, int id_utilizador, int contador_a);
 
 t_data getdate();
 t_hour gethour();
@@ -231,11 +229,7 @@ int main()
                                 AlterarRecursos(arr_recursos, contador_recursos);
                                 break;
                             case 'D':
-<<<<<<< HEAD
                                 EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, &contador_recursos, confirmarLogin);
-=======
-                                EliminarRecursos(arr_acessos, arr_recursos, &contador_acessos, contador_recursos, confirmarLogin);
->>>>>>> 127e4363338c71e25780a681fd32e90c9a6358df
                                 break;
                             case 'V':
                                 break;
@@ -367,9 +361,7 @@ int main()
                         while (opcao8 != 'V');
                         break;
                     case 'C':
-                        EliminarUtilizadores(user_register, arr_acessos, &contador_registar, confirmarLogin);
-                        confirmarLogin = -1;
-                        menu_opcao();
+                        EliminarUtilizadores(user_register, arr_acessos, &contador_registar, confirmarLogin, contador_acessos);
                         break;
                     case 'V':
                         break;
@@ -649,7 +641,7 @@ void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_a, int co
 {
     char mostrar[MAX_CARACTERES];
     int i = 0, contador_recursos=0,comparar_recursos;
-
+    system("cls");
     if (contador_a != 0)
     {
         printf("______________________________________________________________________\n\n");
@@ -660,38 +652,34 @@ void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_a, int co
             printf("%i - %s\n", i+1, array_recursos[i].nome); ///i+1 para a lista dos recursos não começar em 0
         }
         printf("\n______________________________________________________________________\n\n");
+        printf("Indique o nome do recurso que pretende consultar: ");
+        fflush(stdin);
+        gets(mostrar);
+        printf("\n");
+        for (i = 0; i < contador_r; i++)
+        {
+            comparar_recursos = strcasecmp(array_recursos[i].nome, mostrar);
+            if (comparar_recursos == 0)
+            {
+                printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): %i\n", array_recursos[i].tipo_recurso);
+                printf("Designação única: %s\n", array_recursos[i].designacao);
+                printf("Grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): %i\n", array_recursos[i].grau_seguranca);
+                printf("ID: %i\n", array_recursos[i].ID_Recurso);
+                contador_recursos++;
+            }
+        }
+        if (contador_recursos == 0 && comparar_recursos != 0)
+        {
+            printf("O recurso que introduziu não existe.\n");
+            printf("______________________________________________________________________\n\n");
+            getch();
+            return;
+        }
     }
     else
     {
         printf("\nNão tem recursos guardados.\n");
     }
-
-    printf("Indique o nome do recurso que pretende consultar: ");
-    fflush(stdin);
-    gets(mostrar);
-    printf("\n");
-
-    for (i = 0; i < contador_r; i++)
-    {
-        comparar_recursos = strcasecmp(array_recursos[i].nome, mostrar);
-        if (comparar_recursos == 0)
-        {
-            printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): %i\n", array_recursos[i].tipo_recurso);
-            printf("Designação única: %s\n", array_recursos[i].designacao);
-            printf("Grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): %i\n", array_recursos[i].grau_seguranca);
-            printf("ID: %i\n", array_recursos[i].ID_Recurso);
-            contador_recursos++;
-        }
-    }
-
-    if (contador_recursos == 0 && comparar_recursos != 0)
-    {
-        printf("O recurso que introduziu não existe.\n");
-        printf("______________________________________________________________________\n\n");
-        getch();
-        return;
-    }
-
     printf("______________________________________________________________________\n\n");
     getch();
 }
@@ -1228,8 +1216,8 @@ void guardar_ficheiro(t_register user_register[], int contador_registo)
 
 void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r)
 {
-    char mostrar[MAX_CARACTERES];
-    int comparar_recursos, i;
+    char mostrar[MAX_CARACTERES], novo_nome[MAX_CARACTERES];
+    int comparar_recursos, i, encontrado=0;
 
     printf("Indique o nome do recurso que pretende alterar: ");
     fflush(stdin);
@@ -1241,6 +1229,22 @@ void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r)
         comparar_recursos = strcasecmp(array_recursos[i].nome, mostrar);
         if (comparar_recursos == 0)
         {
+            do
+            {
+                printf("Novo nome do recurso: ");
+                scanf("%s", novo_nome);
+                for(int x = 0; x < contador_r; x++)
+                {
+                    encontrado = strcasecmp(array_recursos[x].nome, novo_nome);
+                    if (encontrado == 0)
+                    {
+                        printf("\nJá tem um recurso criado com esse nome.\n");
+                        getch();
+                    }
+                }
+            }
+            while (encontrado == 0);
+            strcpy(array_recursos[i].nome, novo_nome);
             printf("Tipo de recurso atual: %i\n", array_recursos[i].tipo_recurso);
             do
             {
@@ -1550,24 +1554,61 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
     getch();
 }
 
-void EliminarUtilizadores(t_register user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_registo, int id_utilizador)
+void EliminarUtilizadores(t_register user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_registo, int id_utilizador, int contador_a)
 {
-    for(int i = 0; i < *contador_registo; i++)
+    char utilizador_a_eliminar[MAX_CARACTERES];
+    int encontrado = -1, i;
+
+    if(user_registo[id_utilizador].ID_Utilizador == 0) ///Vê se é administrador
     {
-        if (array_acessos[i].id_utilizador != id_utilizador) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
+        printf("\n\tIntroduza o nome do utilizador que pretende eliminar: ");
+        scanf("%s", utilizador_a_eliminar);
+        for(i = 0; i < *contador_registo; i++)
         {
-            for(int x = i; x < *contador_registo-1; x++)
+            printf("\n1encontrado: %i\n", encontrado);
+            getch();
+            if(strcasecmp(user_registo[i].username_login, utilizador_a_eliminar)==0)
             {
-                user_registo[x].ID_Utilizador = user_registo[x+1].ID_Utilizador;
-                strcpy(user_registo[x].nome, user_registo[x+1].nome);
-                strcpy(user_registo[x].password_register, user_registo[x+1].password_register);
-                strcpy(user_registo[x].username_login, user_registo[x+1].username_login);
-                strcpy(user_registo[x].username_register, user_registo[x+1].username_register);
-                user_registo[x].NIC_register = user_registo[x+1].NIC_register;
+                encontrado=i;
+                i=(*contador_registo);
+                printf("\n2encontrado: %i\n", encontrado);
+                getch();
             }
-            (*contador_registo)--;
+        }
+
+        if (encontrado != -1)
+        {
+            for (int y = 0 ; y < contador_a ; y++)
+            {
+                if (array_acessos[y].id_utilizador != user_registo[i].ID_Utilizador) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
+                {
+                    printf("Impossivel eliminar porque você tem acessos guardados\n");
+                    getch();
+                }
+                else
+                {
+                    for(int x = i; x < *contador_registo-1; x++)
+                    {
+                        user_registo[x].ID_Utilizador = user_registo[x+1].ID_Utilizador;
+                        strcpy(user_registo[x].nome, user_registo[x+1].nome);
+                        strcpy(user_registo[x].password_register, user_registo[x+1].password_register);
+                        strcpy(user_registo[x].username_login, user_registo[x+1].username_login);
+                        strcpy(user_registo[x].username_register, user_registo[x+1].username_register);
+                        user_registo[x].NIC_register = user_registo[x+1].NIC_register;
+                    }
+                    (*contador_registo)--;
+                }
+            }
         }
         else
-            printf("Impossivel eliminar porque você tem acessos guardados\n");
+        {
+            printf("Utilizador não encontrado\n");
+            getch();
+        }
+    }
+    else
+    {
+        printf("Funcionalidade apenas para o administrador. Se pretender eliminar, peça ao administrador.\n");
+        getch();
     }
 }
