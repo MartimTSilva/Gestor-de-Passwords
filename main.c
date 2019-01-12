@@ -1556,7 +1556,7 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
                 encontrado2 = strcasecmp(array_acessos[y].login, login);
                 if (encontrado2 == 0 && array_acessos[y].id_utilizador == id_utilizador)
                 {
-                    for(int x = y; x < *contador_a-1; x++)
+                    for(int x = y; x < *contador_a; x++)
                     {
                         strcpy(array_acessos[x].login, array_acessos[x+1].login);
                         strcpy(array_acessos[x].nome, array_acessos[x+1].nome);
@@ -1565,14 +1565,17 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
                         array_acessos[x].id_utilizador=array_acessos[x+1].id_utilizador;
                         array_acessos[x].data=array_acessos[x+1].data;
                         array_acessos[x].hora=array_acessos[x+1].hora;
-                        printf("\t\nAcesso eliminado com sucesso!\n");
                     }
+                    printf("\nAcesso eliminado com sucesso!\n");
                     (*contador_a)--;
                 }
             }
         }
         else
-            printf("\t\nO login de acesso que introduziu não corresponde.\n");
+        {
+            printf("\nO login de acesso que introduziu não corresponde.\n");
+            getch();
+        }
     }
     getch();
 }
@@ -1588,11 +1591,12 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
     for(int i = 0; i < *contador_r; i++)
     {
         encontrado = strcasecmp(array_recursos[i].nome, recurso);
+        printf("encontrado: %d", encontrado);
         if (encontrado == 0)
         {
             if (array_acessos[i].id_recurso != i) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
             {
-                for(int x = i; x < *contador_r-1; x++)
+                for(int x = i; x < *contador_r; x++)
                 {
                     strcpy(array_recursos[x].designacao, array_recursos[x+1].designacao);
                     strcpy(array_recursos[x].nome, array_recursos[x+1].nome);
@@ -1600,15 +1604,22 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
                     array_recursos[x].ID_Recurso = array_recursos[x+1].ID_Recurso;
                     array_recursos[x].identificador = array_recursos[x+1].identificador;
                     array_recursos[x].grau_seguranca = array_recursos[x+1].grau_seguranca;
-                    printf("\t\nRecurso eliminado com sucesso!\n");
                 }
+                printf("\nRecurso eliminado com sucesso!\n");
                 (*contador_r)--;
             }
             else
-                printf("\t\nImpossivel eliminar porque você ou outro utilizador tem acessos guardados no recurso\n");
+                printf("\nImpossivel eliminar porque você ou outro utilizador tem acessos guardados no recurso\n");
         }
+        else
+        {
+            printf("\nO recurso que introduziu não corresponde.\n");
+            getch();
+        }
+                    printf("\nO recurso que introduziu não corresponde.\n");
+            getch();
     }
-    getch();
+
 }
 
 void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_utilizadores, int id_utilizador, int contador_a)
