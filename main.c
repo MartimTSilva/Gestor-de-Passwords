@@ -118,43 +118,19 @@ t_data getdate();
 t_hour gethour();
 ///Outras Funções/////////////////
 
+
 int main()
 {
-    system("chcp 65001"); //Para usar caracteres especiais.
-    system("cls"); //Limpa o ecrã
+    system("chcp 65001");
+    system("cls");
     char opcao, opcao2, opcao3, opcao4, opcao5, opcao6, opcao7, opcao8, sair, string[MAX_CARACTERES];
-    int contador_acessos = 0, pwd, contador_recursos = 0, utilizador_logado = -1, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos=0, opc_register;
-    t_acessos arr_acessos[MAX_ACESSOS] = {"", "", ""};
-    t_recursos arr_recursos[MAX_RECURSOS] = {"", "", "", "", ""};
+    int contador_acessos = 0, contador_recursos = 0, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos=0, utilizador_logado = -1, opc_register, pwd;
+    t_acessos arr_acessos[MAX_ACESSOS];
+    t_recursos arr_recursos[MAX_RECURSOS];
     t_utilizadores user_registo[MAX_UTILIZADORES];
 
-    /*ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
-    for (int h=0; h < contador_acessos ; h++)
-    {
-        printf("\nLogin: %s\nPassword: %s\n", arr_acessos[h].login, arr_acessos[h].password);
-        printf("\nHora: %i:%i\n", arr_acessos[h].hora.hora, arr_acessos[h].hora.minutos);
-        printf("Data: %i/%i/%i\n", arr_acessos[h].data.dia, arr_acessos[h].data.mes, arr_acessos[h].data.ano);
-    }
-    for (int h=0; h < contador_recursos ; h++)
-    {
-        printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): %i\n", arr_recursos[h].tipo_recurso);
-        printf("Designação única: %s\n", arr_recursos[h].designacao);
-        printf("Grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): %i\n", arr_recursos[h].grau_seguranca);
-        printf("ID: %i\n\n", arr_recursos[h].ID_Recurso);
-    }
-    for (int h=0; h < contador_registar ; h++)
-    {
-        printf("\n\tNome: %s\n", user_registo[h].nome);
-        printf("\tUsername: %s\n", user_registo[h].login_utilizador);
-        printf("\tPalavra-Passe: %s\n", user_registo[h].password_utilizador);
-        printf("\tNumero de identificação civil: %i\n", user_registo[h].NIC);
-        printf("\tID: %i\n\n", user_registo[h].ID_Utilizador);
-        printf("\t-----------------------------------------\n");
-    }
-    getch();
-    */
-
     contador_registar = InserirAdmin(user_registo, contador_registar);
+    ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
 
     do
     {
@@ -717,6 +693,7 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
             printf("\nLogin: %s\nPassword: %s\n", array_acessos[i].login, array_acessos[i].password);
             printf("\nHora: %i:%i\n", array_acessos[i].hora.hora, array_acessos[i].hora.minutos);
             printf("Data: %i/%i/%i\n", array_acessos[i].data.dia, array_acessos[i].data.mes, array_acessos[i].data.ano);
+            printf("ID RECURSO: %d\n\n", array_acessos[i].id_recurso);
             printf("-----------------\n");
             contador_acessos++; ///Contador necessário para verificar se não existe nenhum acesso com esse recurso.
         }
@@ -1554,7 +1531,7 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
             for (int y = 0; y < *contador_a; y++)
             {
                 encontrado2 = strcasecmp(array_acessos[y].login, login);
-                if (encontrado2 == 0 && array_acessos[y].id_utilizador == id_utilizador)
+                if (encontrado2 == 0)
                 {
                     for(int x = y; x < *contador_a; x++)
                     {
@@ -1566,14 +1543,14 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
                         array_acessos[x].data=array_acessos[x+1].data;
                         array_acessos[x].hora=array_acessos[x+1].hora;
                     }
-                    printf("\nAcesso eliminado com sucesso!\n");
+                    printf("\n\tAcesso eliminado com sucesso!\n");
                     (*contador_a)--;
                 }
             }
         }
         else
         {
-            printf("\nO login de acesso que introduziu não corresponde.\n");
+            printf("\n\tO login de acesso que introduziu não corresponde.\n");
             getch();
         }
     }
@@ -1585,18 +1562,17 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
     char recurso[MAX_CARACTERES];
     int encontrado;
 
-    printf("\t\nIndique o nome do recurso que pretende eliminar: ");
+    printf("\n\tIndique o nome do recurso que pretende eliminar: ");
     scanf("%s", recurso);
 
     for(int i = 0; i < *contador_r; i++)
     {
         encontrado = strcasecmp(array_recursos[i].nome, recurso);
-        printf("encontrado: %d", encontrado);
         if (encontrado == 0)
         {
             if (array_acessos[i].id_recurso != i) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
             {
-                for(int x = i; x < *contador_r; x++)
+                for(int x = i; x < *contador_r-1; x++)
                 {
                     strcpy(array_recursos[x].designacao, array_recursos[x+1].designacao);
                     strcpy(array_recursos[x].nome, array_recursos[x+1].nome);
@@ -1605,21 +1581,19 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
                     array_recursos[x].identificador = array_recursos[x+1].identificador;
                     array_recursos[x].grau_seguranca = array_recursos[x+1].grau_seguranca;
                 }
-                printf("\nRecurso eliminado com sucesso!\n");
+                printf("\n\tRecurso eliminado com sucesso!\n");
                 (*contador_r)--;
+                getch();
             }
             else
-                printf("\nImpossivel eliminar porque você ou outro utilizador tem acessos guardados no recurso\n");
+                printf("Impossivel eliminar porque você ou outro utilizador tem acessos guardados no recurso\n");
         }
         else
         {
-            printf("\nO recurso que introduziu não corresponde.\n");
+            printf("\n\tO recurso que introduziu não corresponde.\n");
             getch();
         }
-                    printf("\nO recurso que introduziu não corresponde.\n");
-            getch();
     }
-
 }
 
 void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_utilizadores, int id_utilizador, int contador_a)
