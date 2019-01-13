@@ -119,18 +119,24 @@ t_hour gethour();
 ///Outras Funções/////////////////
 
 
+///Funções das estatisticas///////////////
+char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES], int utilizador_logado);
+void  ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r);
+void  ListagemAcessos(t_utilizadores user_registo[], t_acessos array_acessos[], int contador_utilizadores, int *contador_a);
+///Funções das estatisticas///////////////
+
 int main()
 {
     system("chcp 65001");
     system("cls");
-    char opcao, opcao2, opcao3, opcao4, opcao5, opcao6, opcao7, opcao8, sair, string[MAX_CARACTERES];
+    char opcao, opcao2, opcao3, opcao4, opcao5, opcao6, opcao7, opcao8, opcao9, sair, string[MAX_CARACTERES];
     int contador_acessos = 0, contador_recursos = 0, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos=0, utilizador_logado = -1, opc_register, pwd, ficheiro_guardado=0;
     t_acessos arr_acessos[MAX_ACESSOS];
     t_recursos arr_recursos[MAX_RECURSOS];
     t_utilizadores user_registo[MAX_UTILIZADORES];
 
     contador_registar = InserirAdmin(user_registo, contador_registar);
-    ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
+    //ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
 
     do
     {
@@ -229,7 +235,18 @@ int main()
                         VerUtilizadores(user_registo, contador_registar, utilizador_logado);
                         break;
                     case 'D':
-                        printf("\nA funcionalidade das estatisticas ainda não está feito\n");
+                        opcao9 = MenuEstatisticas(user_registo, utilizador_logado);
+                        switch (opcao9)
+                        {
+                        case 'A':
+                            ListagemRecursosPorTipo(arr_recursos, &contador_recursos);
+                            break;
+                        case 'B':
+                            ListagemAcessos(user_registo, arr_acessos, contador_registar, contador_acessos);
+                            break;
+                        case 'V':
+                            break;
+                        }
                         getch();
                         break;
                     case 'V':
@@ -407,8 +424,8 @@ char MenuGestor(void)
     printf("\t/                                             \\\n");
     printf("\t\\  A - Gerir Acessos                          /\n");
     printf("\t/  B - Gerir Recursos                         \\\n");
-    printf("\t\\  C - Gerir Utilizadores                     /\n");
-    printf("\t/  D - Estatisticas (Incompleto)              \\\n");
+    printf("\t\\  C - Gerir Utilizadores (Administrador)     /\n");
+    printf("\t/  D - Estatisticas                           \\\n");
     printf("\t\\  V - Voltar                                 /\n");
     printf("\t/_____________________________________________\\\n");
     printf("\n");
@@ -430,7 +447,7 @@ char MenuGestorAcessos(void)
     printf("\t\\  A - Inserir Acessos                         /\n");
     printf("\t/  B - Consultar Acessos                       \\\n");
     printf("\t\\  C - Alterar Acessos                         /\n");
-    printf("\t/  D - Eliminar Acessos (Incompleto)           \\\n");
+    printf("\t/  D - Eliminar Acessos                        \\\n");
     printf("\t\\  V - Voltar                                  /\n");
     printf("\t/______________________________________________\\\n");
     printf("\n");
@@ -452,7 +469,7 @@ char MenuGestorRecursos(void)
     printf("\t\\  A - Inserir Recursos                          /\n");
     printf("\t/  B - Consultar Recursos                        \\\n");
     printf("\t\\  C - Alterar Recursos                          /\n");
-    printf("\t/  D - Eliminar Recursos (Incompleto)            \\\n");
+    printf("\t/  D - Eliminar Recursos                         \\\n");
     printf("\t\\  V - Voltar                                    /\n");
     printf("\t/________________________________________________\\\n");
     printf("\n");
@@ -492,7 +509,7 @@ void MenuSobre(void)
     printf("\t\\     Projeto de Fundamento de Porgramação     /\n");
     printf("\t/                 Elaborado por:               \\\n");
     printf("\t\\            Martim Silva nº2180686            /\n");
-    printf("\t/          Gabriel Marques nº2180637           \\\n");
+    printf("\t/            Gabriel Marques nº2180637         \\\n");
     printf("\t\\                                              /\n");
     printf("\t/                            TeSP PSI - PL4    \\\n");
     printf("\t\\______________________________________________/\n");
@@ -1116,16 +1133,12 @@ int MenuRegistar(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_uti
         user_registo[contador_utilizadores].ID_Utilizador = *seq_ID_Utlizador;
         getch();
         return contador_utilizadores+1;
-
     }
     else
     {
         printf("\n\tNúmero máximo de utilizadores excedido.\n");
         getch();
     }
-
-
-
 }
 
 void VerUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES],int contador_utilizadores, int utilizador_logado)
@@ -1151,11 +1164,11 @@ void VerUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES],int contador_
         printf("\n\tNão tem premissões para esse comando (Apenas como administrador)\n");
         getch();
     }
-
 }
 
 int InserirAdmin(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores)
 {
+    strcpy(user_registo[contador_utilizadores].nome, "Admin");
     user_registo[contador_utilizadores].ID_Utilizador=0;
     user_registo[contador_utilizadores].NIC=999999999;
     strcpy(user_registo[contador_utilizadores].login_utilizador, "admin");
@@ -1194,29 +1207,6 @@ void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos arra
             (*contador_utilizadores) = n_elementos;
         }*/
         fclose(ficheiro);
-    }
-
-    for (int h=0; h < *contador_a ; h++)
-    {
-        printf("\nLogin: %s\nPassword: %s\n", array_acessos[h].login, array_acessos[h].password);
-        printf("\nHora: %i:%i\n", array_acessos[h].hora.hora, array_acessos[h].hora.minutos);
-        printf("Data: %i/%i/%i\n", array_acessos[h].data.dia, array_acessos[h].data.mes, array_acessos[h].data.ano);
-    }
-    for (int h=0; h < *contador_r ; h++)
-    {
-        printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): %i\n", array_recursos[h].tipo_recurso);
-        printf("Designação única: %s\n", array_recursos[h].designacao);
-        printf("Grau de segurança (1 - Baixo | 2 - Médio | 3 - Elevado): %i\n", array_recursos[h].grau_seguranca);
-        printf("ID: %i\n\n", array_recursos[h].ID_Recurso);
-    }
-    for (int h=0; h < *contador_utilizadores ; h++)
-    {
-        printf("\n\tNome: %s\n", user_registo[h].nome);
-        printf("\tUsername: %s\n", user_registo[h].login_utilizador);
-        printf("\tPalavra-Passe: %s\n", user_registo[h].password_utilizador);
-        printf("\tNumero de identificação civil: %i\n", user_registo[h].NIC);
-        printf("\tID: %i\n\n", user_registo[h].ID_Utilizador);
-        printf("\t-----------------------------------------\n");
     }
 }
 
@@ -1552,11 +1542,11 @@ void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recu
                 }
             }
         }
-        else
-        {
-            printf("\n\tO login de acesso que introduziu não corresponde.\n");
-            getch();
-        }
+        break;
+    }
+    if (encontrado != 0)
+    {
+        printf("\n\tO login de acesso que introduziu não corresponde.\n");
     }
     getch();
 }
@@ -1587,17 +1577,17 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
                 }
                 printf("\n\tRecurso eliminado com sucesso!\n");
                 (*contador_r)--;
-                getch();
             }
             else
                 printf("Impossivel eliminar porque você ou outro utilizador tem acessos guardados no recurso\n");
         }
-        else
-        {
-            printf("\n\tO recurso que introduziu não corresponde.\n");
-            getch();
-        }
+        break;
     }
+    if (encontrado != 0)
+    {
+        printf("\n\tO recurso que introduziu não corresponde.\n");
+    }
+    getch();
 }
 
 void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_utilizadores, int id_utilizador, int contador_a)
@@ -1655,5 +1645,66 @@ void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acess
     {
         printf("Funcionalidade apenas para o administrador. Se pretender eliminar a sua conta, peça ao administrador.\n");
         getch();
+    }
+}
+
+char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES] ,int utilizador_logado)
+{
+    char opcao;
+    if(user_registo[utilizador_logado].ID_Utilizador == 0)
+    {
+        printf("\n\tA - Listagem de recursos por tipo\n");
+        printf("\tB - Listagem de acessos dos utilizadores\n");
+        printf("\tV - Voltar\n");
+        opcao = LerCaracter();
+        return opcao;
+    }
+    else
+    {
+        printf("\n\tNão tem premissões para esse comando (Apenas como administrador)\n");
+    }
+}
+
+void  ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r)
+{
+    int tipo;
+    system("cls");
+    printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): ");
+    fflush(stdin);
+    scanf("%d", &tipo);
+    for (int i = 0; i < *contador_r; i++)
+    {
+        if (array_recursos[i].tipo_recurso == tipo)
+        {
+            printf("____________________________________\n\n");
+            printf("Nome: %s\n", array_recursos[i].nome);
+            printf("Designação: %s\n", array_recursos[i].designacao);
+            printf("Grau de segurança: %i\n", array_recursos[i].grau_seguranca);
+            printf("____________________________________\n");
+        }
+    }
+}
+
+void  ListagemAcessos(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int contador_utilizadores, int *contador_a)
+{
+    int utilizador;
+    system("cls");
+    for (int i = 0 ; i < contador_utilizadores ; i++)
+    {
+        printf("%d - %s\n", i, user_registo[i].nome);
+    }
+    printf("\nIntroduza o número do utilizador: ");
+    fflush(stdin);
+    scanf("%d", &utilizador);
+    for (int x = 0 ; x < contador_utilizadores+1 ; x++)
+    {
+        if (array_acessos[x].id_utilizador == utilizador)
+        {
+            printf("____________________________________\n\n");
+            printf("Nome: %s\n", array_acessos[x].nome);
+            printf("Login: %s\n", array_acessos[x].login);
+            printf("Password: %s\n", array_acessos[x].password);
+            printf("____________________________________\n");
+        }
     }
 }
