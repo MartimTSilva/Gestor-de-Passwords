@@ -73,7 +73,7 @@ char MenuGestor(void);
 void MenuSobre(void);
 char MenuGerador(void);
 char MenuGestorRecursos(void);
-char ConfirmarSaida(void);
+char ConfirmarSaida(int ficheiro_guardado);
 char MenuExtras(void);
 char MenuGestorAcessos(void);
 char MenuMinhaConta();
@@ -113,7 +113,7 @@ void VerDadosUtilizador(t_utilizadores user_registo[MAX_UTILIZADORES], int conta
 ///Outras Funções/////////////////
 void VerificadorPassword(t_recursos array_recursos[], int contador_r, char *password[]);
 void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int *contador_utilizadores, int *contador_r, int *contador_a);
-void guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_utilizadores, int contador_r, int contador_a);
+int guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_utilizadores, int contador_r, int contador_a);
 t_data getdate();
 t_hour gethour();
 ///Outras Funções/////////////////
@@ -124,7 +124,7 @@ int main()
     system("chcp 65001");
     system("cls");
     char opcao, opcao2, opcao3, opcao4, opcao5, opcao6, opcao7, opcao8, sair, string[MAX_CARACTERES];
-    int contador_acessos = 0, contador_recursos = 0, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos=0, utilizador_logado = -1, opc_register, pwd;
+    int contador_acessos = 0, contador_recursos = 0, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos=0, utilizador_logado = -1, opc_register, pwd, ficheiro_guardado=0;
     t_acessos arr_acessos[MAX_ACESSOS];
     t_recursos arr_recursos[MAX_RECURSOS];
     t_utilizadores user_registo[MAX_UTILIZADORES];
@@ -148,7 +148,7 @@ int main()
                 contador_registar = MenuRegistar(user_registo, contador_registar, &seq_ID_Utlizador);
                 break;
             case 3:
-                sair = ConfirmarSaida();
+                sair = ConfirmarSaida(ficheiro_guardado);
                 if(sair=='S')
                     return 0;
                 else
@@ -293,7 +293,7 @@ int main()
                 ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
                 break;
             case 'D':
-                guardar_ficheiro(user_registo, arr_recursos, arr_acessos,contador_registar, contador_recursos, contador_acessos);
+                ficheiro_guardado = guardar_ficheiro(user_registo, arr_recursos, arr_acessos,contador_registar, contador_recursos, contador_acessos);
                 break;
             case 'E':
                 do
@@ -346,7 +346,7 @@ int main()
             case 'F':
                 break;
             case 'S':
-                sair = ConfirmarSaida();
+                sair = ConfirmarSaida(ficheiro_guardado);
                 if(sair == 'S')
                     return 0;
                 break;
@@ -524,10 +524,11 @@ char MenuGerador(void)
 }
 
 
-char ConfirmarSaida(void)
+char ConfirmarSaida(int ficheiro_guardado)
 {
     char sair;
-
+    if (ficheiro_guardado == 0)
+        printf("\n\tFicheiro não foi guardado, tem a certeza que quer sair?\n");
     printf("______________________________________________________________________\n");
     printf("\tQuer mesmo sair? [S/N]: ");
     fflush(stdin);
@@ -1219,8 +1220,9 @@ void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos arra
     }
 }
 
-void guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_utilizadores, int contador_r, int contador_a)
+int guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_utilizadores, int contador_r, int contador_a)
 {
+    int ficheiro_guardado=0;
     FILE *ficheiro;
     ficheiro = fopen("dados.dat", "wb");
     if (ficheiro == NULL)
@@ -1238,6 +1240,8 @@ void guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos 
         fwrite(array_acessos, sizeof(t_acessos), contador_a, ficheiro);
 
         fclose(ficheiro);
+        ficheiro_guardado = 1;
+        return ficheiro_guardado;
     }
 }
 
