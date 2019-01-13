@@ -68,7 +68,7 @@ char gerador_espec[18] = { '_', '.', '-', '$', '/', '&', '(', ')', '[', ']', '?'
 int MenuInicial(void);
 int MenuRegistar(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores, int *seq_ID_Utlizador);
 int MenuLogin (t_utilizadores user_registo[MAX_UTILIZADORES],int contador_utilizadores);
-char MenuPrincipal(void);
+char MenuPrincipal(t_utilizadores user_registo[MAX_UTILIZADORES], int utilizador_logado);
 char MenuGestor(void);
 void MenuSobre(void);
 char MenuGerador(void);
@@ -168,7 +168,7 @@ int main()
 
         do
         {
-            opcao=MenuPrincipal();
+            opcao=MenuPrincipal(user_registo, utilizador_logado);
             switch (opcao)
             {
             case 'A':
@@ -388,11 +388,11 @@ char LerCaracter()
     return opcao;
 }
 
-char MenuPrincipal(void)
+char MenuPrincipal(t_utilizadores user_registo[MAX_UTILIZADORES], int utilizador_logado)
 {
     char opcao;
     system("cls");
-
+    printf(" Utilizador logado: %s\n", user_registo[utilizador_logado].login_utilizador);
     printf("\n");
     printf("\t                ________________              \n");
     printf("\t               | MENU PRINCIPAL |             \n");
