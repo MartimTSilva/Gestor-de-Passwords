@@ -1687,14 +1687,14 @@ void  ListagemAcessos(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos a
 {
     int utilizador;
     system("cls");
-    for (int i = 0 ; i < contador_utilizadores ; i++)
+    for (int i = 1 ; i < contador_utilizadores ; i++)
     {
         printf("%d - %s\n", i, user_registo[i].nome);
     }
     printf("\nIntroduza o número do utilizador: ");
     fflush(stdin);
     scanf("%d", &utilizador);
-    for (int x = 0 ; x < contador_utilizadores+1 ; x++)
+    for (int x = 0 ; x < contador_a ; x++)
     {
         if (array_acessos[x].id_utilizador == utilizador)
         {
