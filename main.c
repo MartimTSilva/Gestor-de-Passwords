@@ -80,20 +80,20 @@ char MenuAlterarUtilizadores();
 ///Funções Menus/////////////////
 
 
-///Funções Recursos/////////////////
-int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r, int *seq_ID_Recursos);
-void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r);
-void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r);
-void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int *contador_r, int id_utilizador);
-///Funções Recursos/////////////////
-
-
 ///Funções Acessos/////////////////
 int InserirAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_ACESSOS], int contador_a, int contador_r, int id_utilizador);
 void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r, int id_utilizador, char mostrar[MAX_CARACTERES]);
 void AlterarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r, int id_utilizador);
 void EliminarAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int contador_r, int id_utilizador);
 ///Funções Acessos/////////////////
+
+
+///Funções Recursos/////////////////
+int InserirRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r, int *seq_ID_Recursos);
+void VerRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r);
+void AlterarRecursos(t_recursos array_recursos[MAX_RECURSOS], int contador_r);
+void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int *contador_a, int *contador_r, int id_utilizador);
+///Funções Recursos/////////////////
 
 
 ///Funções Utilizadores/////////////////
@@ -122,6 +122,8 @@ t_hour gethour();
 char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES], int utilizador_logado);
 void  ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r);
 void  ListagemAcessos(t_utilizadores user_registo[], t_acessos array_acessos[], int contador_utilizadores, int *contador_a);
+void RecursoComMaisAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r);
+void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_registo[], int contador_a, int contador_r, int contador_registar);
 ///Funções das estatisticas///////////////
 
 int main()
@@ -135,7 +137,7 @@ int main()
     t_utilizadores user_registo[MAX_UTILIZADORES];
 
     contador_registar = InserirAdmin(user_registo, contador_registar);
-    //ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
+    ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
 
     do
     {
@@ -242,6 +244,12 @@ int main()
                             break;
                         case 'B':
                             ListagemAcessos(user_registo, arr_acessos, contador_registar, contador_acessos);
+                            break;
+                        case 'C':
+                            RecursoComMaisAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos);
+                            break;
+                        case 'D':
+                            UtilizadorComMaisAcessos(arr_acessos, user_registo, contador_acessos, contador_recursos, contador_registar);
                             break;
                         case 'V':
                             break;
@@ -710,7 +718,6 @@ void VerAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[
             printf("\nLogin: %s\nPassword: %s\n", array_acessos[i].login, array_acessos[i].password);
             printf("\nHora: %i:%i\n", array_acessos[i].hora.hora, array_acessos[i].hora.minutos);
             printf("Data: %i/%i/%i\n", array_acessos[i].data.dia, array_acessos[i].data.mes, array_acessos[i].data.ano);
-            printf("ID RECURSO: %d\n\n", array_acessos[i].id_recurso);
             printf("-----------------\n");
             contador_acessos++; ///Contador necessário para verificar se não existe nenhum acesso com esse recurso.
         }
@@ -1646,13 +1653,16 @@ void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acess
     }
 }
 
-char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES] ,int utilizador_logado)
+char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES],int utilizador_logado)
 {
     char opcao;
+    system("cls");
     if(user_registo[utilizador_logado].ID_Utilizador == 0)
     {
         printf("\n\tA - Listagem de recursos por tipo\n");
         printf("\tB - Listagem de acessos dos utilizadores\n");
+        printf("\tC - Recurso com mais acessos\n");
+        printf("\tD - Utilizador com mais acessos\n");
         printf("\tV - Voltar\n");
         opcao = LerCaracter();
         return opcao;
@@ -1663,7 +1673,7 @@ char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES] ,int utiliza
     }
 }
 
-void  ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r)
+void ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r)
 {
     int tipo;
     system("cls");
@@ -1683,7 +1693,7 @@ void  ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r)
     }
 }
 
-void  ListagemAcessos(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int contador_utilizadores, int *contador_a)
+void ListagemAcessos(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int contador_utilizadores, int *contador_a)
 {
     int utilizador;
     system("cls");
@@ -1705,4 +1715,56 @@ void  ListagemAcessos(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos a
             printf("____________________________________\n");
         }
     }
+}
+
+void RecursoComMaisAcessos(t_acessos array_acessos[], t_recursos array_recursos[], int contador_a, int contador_r)
+{
+    int numero_acessos=0, contador=0, id_recurso=-1, i, j;
+
+    for (i=0; i < contador_r; i++)
+    {
+        contador = 0;
+        for (j=0; j < contador_a; j++)
+        {
+            if (array_recursos[i].ID_Recurso == array_acessos[j].id_recurso)
+            {
+                contador++;
+            }
+
+        }
+        if (contador > numero_acessos)
+        {
+            numero_acessos = contador;
+            id_recurso = array_acessos[i].id_recurso;
+            contador = i;
+        }
+    }
+    printf("\t________________________\n");
+    printf("\n\tO recurso com mais acessos é o: %s, com %d acessos.\n", array_recursos[contador].nome, numero_acessos);
+}
+
+void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_registo[], int contador_a, int contador_r, int contador_registar)
+{
+    int numero_acessos=0, contador=0, id_utilizador=-1, i, j;
+
+    for (i=1; i < contador_registar; i++)
+    {
+        contador = 0;
+        for (j=0; j < contador_a; j++)
+        {
+            if (user_registo[i].ID_Utilizador == array_acessos[j].id_utilizador)
+            {
+                contador++;
+            }
+        }
+        if (contador > numero_acessos)
+        {
+            numero_acessos = contador;
+            id_utilizador = array_acessos[i].id_recurso;
+            contador = i;
+            if (contador == numero_acessos)
+        }
+    }
+    printf("\t________________________\n");
+    printf("\n\tO utilizador com mais acessos é o: %s, com %d acessos.\n", user_registo[id_utilizador].nome, numero_acessos);
 }
