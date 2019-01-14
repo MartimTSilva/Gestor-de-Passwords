@@ -44,7 +44,6 @@ typedef struct
 typedef struct
 {
     int ID_Recurso;
-    int identificador;
     char nome[MAX_CARACTERES];
     int tipo_recurso;
     int grau_seguranca;
@@ -1572,7 +1571,6 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
                     strcpy(array_recursos[x].nome, array_recursos[x+1].nome);
                     array_recursos[x].tipo_recurso = array_recursos[x+1].tipo_recurso;
                     array_recursos[x].ID_Recurso = array_recursos[x+1].ID_Recurso;
-                    array_recursos[x].identificador = array_recursos[x+1].identificador;
                     array_recursos[x].grau_seguranca = array_recursos[x+1].grau_seguranca;
                 }
                 printf("\n\tRecurso eliminado com sucesso!\n");
