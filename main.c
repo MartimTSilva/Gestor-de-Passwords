@@ -3,6 +3,8 @@
 #include <locale.h>
 #include <ctype.h>
 #include <string.h>
+#include <time.h>
+
 #define MAX_UTILIZADORES 21
 #define MAX_RECURSOS 100
 #define MAX_ACESSOS 200
@@ -77,6 +79,7 @@ char MenuExtras(void);
 char MenuGestorAcessos(void);
 char MenuMinhaConta();
 char MenuAlterarUtilizadores();
+char MenuUtilizadores();
 ///Funções Menus/////////////////
 
 
@@ -124,13 +127,14 @@ void  ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r);
 void  ListagemAcessos(t_utilizadores user_registo[], t_acessos array_acessos[], int contador_utilizadores, int *contador_a);
 void RecursoComMaisAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r);
 void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_registo[], int contador_a, int contador_r, int contador_registar);
+void DiasDesdeUltimoAcesso(t_recursos array_recursos[], t_acessos array_acessos[], int contador_r, int contador_a);
 ///Funções das estatisticas///////////////
 
 int main()
 {
     system("chcp 65001");
     system("cls");
-    char opcao, opcao2, opcao3, opcao4, opcao5, opcao6, opcao7, opcao8, opcao9, sair, string[MAX_CARACTERES];
+    char opcao, opcao2, opcao3, opcao4, opcao5, opcao6, opcao7, opcao8, opcao9, opcao10, sair, string[MAX_CARACTERES];
     int contador_acessos = 0, contador_recursos = 0, contador_registar=0, seq_ID_Utlizador=0, seq_ID_Recursos=0, utilizador_logado = -1, opc_register, pwd, ficheiro_guardado=0;
     t_acessos arr_acessos[MAX_ACESSOS];
     t_recursos arr_recursos[MAX_RECURSOS];
@@ -231,30 +235,50 @@ int main()
                         }
                         while (opcao4 != 'V');
                         break;
-
                     case 'C':
-                        VerUtilizadores(user_registo, contador_registar, utilizador_logado);
+                        do
+                        {
+                            opcao10 = MenuUtilizadores();
+                            switch (opcao10)
+                            {
+                            case 'A':
+                                VerUtilizadores(user_registo, contador_registar, utilizador_logado);
+                                break;
+                            case 'B':
+                                EliminarUtilizadores(user_registo, arr_acessos, &contador_registar, utilizador_logado, contador_acessos);
+                                break;
+                            case 'V':
+                                break;
+                            }
+                        }
+                        while (opcao10 != 'V');
                         break;
                     case 'D':
-                        opcao9 = MenuEstatisticas(user_registo, utilizador_logado);
-                        switch (opcao9)
+                        do
                         {
-                        case 'A':
-                            ListagemRecursosPorTipo(arr_recursos, &contador_recursos);
-                            break;
-                        case 'B':
-                            ListagemAcessos(user_registo, arr_acessos, contador_registar, contador_acessos);
-                            break;
-                        case 'C':
-                            RecursoComMaisAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos);
-                            break;
-                        case 'D':
-                            UtilizadorComMaisAcessos(arr_acessos, user_registo, contador_acessos, contador_recursos, contador_registar);
-                            break;
-                        case 'V':
-                            break;
+                            opcao9 = MenuEstatisticas(user_registo, utilizador_logado);
+                            switch (opcao9)
+                            {
+                            case 'A':
+                                ListagemRecursosPorTipo(arr_recursos, &contador_recursos);
+                                break;
+                            case 'B':
+                                ListagemAcessos(user_registo, arr_acessos, contador_registar, contador_acessos);
+                                break;
+                            case 'C':
+                                RecursoComMaisAcessos(arr_acessos, arr_recursos, contador_acessos, contador_recursos);
+                                break;
+                            case 'D':
+                                UtilizadorComMaisAcessos(arr_acessos, user_registo, contador_acessos, contador_recursos, contador_registar);
+                                break;
+                            case 'E':
+                                DiasDesdeUltimoAcesso(arr_recursos, arr_acessos, contador_recursos, contador_acessos);
+                                break;
+                            case 'V':
+                                break;
+                            }
                         }
-                        getch();
+                        while (opcao9 != 'V');
                         break;
                     case 'V':
                         break;
@@ -354,9 +378,6 @@ int main()
                             }
                         }
                         while (opcao8 != 'V');
-                        break;
-                    case 'C':
-                        EliminarUtilizadores(user_registo, arr_acessos, &contador_registar, utilizador_logado, contador_acessos);
                         break;
                     case 'V':
                         break;
@@ -1150,9 +1171,9 @@ int MenuRegistar(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_uti
 void VerUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES],int contador_utilizadores, int utilizador_logado)
 {
     int i;
-    system("cls");
     if(user_registo[utilizador_logado].ID_Utilizador == 0)
     {
+        system("cls");
         for (i = 0; i < contador_utilizadores; i++)
         {
             printf("\n\tNome: %s\n", user_registo[i].nome);
@@ -1167,7 +1188,7 @@ void VerUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES],int contador_
     }
     else
     {
-        printf("\n\tNão tem premissões para esse comando (Apenas como administrador)\n");
+        printf("\n\tNão tem premissões para este comando. \n");
         getch();
     }
 }
@@ -1403,14 +1424,40 @@ t_hour gethour()
     return hour;
 }
 
+char MenuUtilizadores()
+{
+    char opcao10;
+    system("cls");
+
+    printf("\n");
+    printf("\t               _________________                \n");
+    printf("\t              | MENU UTILIZADOR | (Administrador)\n");
+    printf("\t _____________|_________________|______________ \n");
+    printf("\t/                                              \\\n");
+    printf("\t\\  A - Ver dados de todos os utilizadores      /\n");
+    printf("\t/  B - Eliminar utilizadores                   \\\n");
+    printf("\t\\  V - Voltar                                  /\n");
+    printf("\t/______________________________________________\\\n");
+    printf("\n");
+    opcao10 = LerCaracter();
+    return opcao10;
+}
+
 char MenuMinhaConta()
 {
     char opcao7;
     system("cls");
-    printf("\n\tA - Ver dados\n");
-    printf("\tB - Alterar dados\n");
-    printf("\tC - Apagar conta\n");
-    printf("\tV - Voltar\n");
+
+    printf("\n");
+    printf("\t               __________________                \n");
+    printf("\t              | MENU MINHA CONTA |               \n");
+    printf("\t _____________|__________________|______________ \n");
+    printf("\t/                                               \\\n");
+    printf("\t\\  A - Ver dados                                /\n");
+    printf("\t/  B - Alterar dados                            \\\n");
+    printf("\t\\  V - Voltar                                   /\n");
+    printf("\t/_______________________________________________\\\n");
+    printf("\n");
     opcao7 = LerCaracter();
     return opcao7;
 }
@@ -1621,7 +1668,7 @@ void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acess
             {
                 if (array_acessos[y].id_utilizador == user_registo[i].ID_Utilizador) ///Procurar se há algum id_recurso que é guardado no acesso com o numero de recurso que se está a apagar (i)
                 {
-                    printf("\t\nImpossivel eliminar porque você tem acessos guardados\n");
+                    printf("\n\tImpossivel eliminar porque você tem acessos guardados\n");
                     eliminar = 0;
                     getch();
                 }
@@ -1642,13 +1689,13 @@ void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acess
         }
         else
         {
-            printf("\t\nUtilizador não encontrado\n");
+            printf("\n\tUtilizador não encontrado\n");
             getch();
         }
     }
     else
     {
-        printf("Funcionalidade apenas para o administrador. Se pretender eliminar a sua conta, peça ao administrador.\n");
+        printf("\n\tFuncionalidade apenas para o administrador. Se pretender eliminar a sua conta, peça ao administrador.\n");
         getch();
     }
 }
@@ -1656,91 +1703,123 @@ void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acess
 char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES],int utilizador_logado)
 {
     char opcao;
-    system("cls");
     if(user_registo[utilizador_logado].ID_Utilizador == 0)
     {
-        printf("\n\tA - Listagem de recursos por tipo\n");
-        printf("\tB - Listagem de acessos dos utilizadores\n");
-        printf("\tC - Recurso com mais acessos\n");
-        printf("\tD - Utilizador com mais acessos\n");
-        printf("\tV - Voltar\n");
+        system("cls");
+        printf("\n");
+        printf("\t                ________________              \n");
+        printf("\t               |  ESTATÍSTICAS  |             \n");
+        printf("\t ______________|________________|_____________ \n");
+        printf("\t/                                             \\\n");
+        printf("\t\\  A - Listagem de recursos por tipo          /\n");
+        printf("\t/  B - Listagem de acessos dos utilizadores   \\\n");
+        printf("\t\\  C - Recurso com mais acessos               /\n");
+        printf("\t/  D - Utilizador com mais acessos            \\\n");
+        printf("\t\\  E - Dias desde o último acesso             /\n");
+        printf("\t/  V - Voltar                                 \\\n");
+        printf("\t\\_____________________________________________/\n");
+        printf("\n");
         opcao = LerCaracter();
         return opcao;
     }
     else
     {
-        printf("\n\tNão tem premissões para esse comando (Apenas como administrador)\n");
+        printf("\n\tNão tem premissões para este menu (Apenas como administrador)\n");
     }
 }
 
 void ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r)
 {
     int tipo;
-    system("cls");
-    printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): ");
-    fflush(stdin);
-    scanf("%d", &tipo);
-    for (int i = 0; i < *contador_r; i++)
+    if (*contador_r == 0)
     {
-        if (array_recursos[i].tipo_recurso == tipo)
+        printf("\n\tNão têm quaisquer recursos criados.\n");
+    }
+    else
+    {
+        system("cls");
+        printf("Tipo de recurso (1 - Site | 2 - Aplicação | 3 - Dispositivo): ");
+        fflush(stdin);
+        scanf("%d", &tipo);
+        for (int i = 0; i < *contador_r; i++)
         {
-            printf("____________________________________\n\n");
-            printf("Nome: %s\n", array_recursos[i].nome);
-            printf("Designação: %s\n", array_recursos[i].designacao);
-            printf("Grau de segurança: %i\n", array_recursos[i].grau_seguranca);
-            printf("____________________________________\n");
+            if (array_recursos[i].tipo_recurso == tipo)
+            {
+                printf("____________________________________\n\n");
+                printf("Nome: %s\n", array_recursos[i].nome);
+                printf("Designação: %s\n", array_recursos[i].designacao);
+                printf("Grau de segurança: %i\n", array_recursos[i].grau_seguranca);
+                printf("____________________________________\n");
+            }
         }
     }
+    getch();
 }
 
 void ListagemAcessos(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int contador_utilizadores, int *contador_a)
 {
     int utilizador;
-    system("cls");
-    for (int i = 1 ; i < contador_utilizadores ; i++)
+    if (contador_a == 0)
     {
-        printf("%d - %s\n", i, user_registo[i].nome);
+        printf("\n\tNenhum utilizador tem acessos.\n");
     }
-    printf("\nIntroduza o número do utilizador: ");
-    fflush(stdin);
-    scanf("%d", &utilizador);
-    for (int x = 0 ; x < contador_a ; x++)
+    else
     {
-        if (array_acessos[x].id_utilizador == utilizador)
+        system("cls");
+        for (int i = 1 ; i < contador_utilizadores ; i++)
         {
-            printf("____________________________________\n\n");
-            printf("Nome: %s\n", array_acessos[x].nome);
-            printf("Login: %s\n", array_acessos[x].login);
-            printf("Password: %s\n", array_acessos[x].password);
-            printf("____________________________________\n");
+            printf("%d - %s\n", i, user_registo[i].login_utilizador);
+        }
+        printf("\nIntroduza o número do utilizador: ");
+        fflush(stdin);
+        scanf("%d", &utilizador);
+        for (int x = 0 ; x < contador_a ; x++)
+        {
+            if (array_acessos[x+1].id_utilizador == utilizador)
+            {
+                printf("____________________________________\n\n");
+                printf("Nome do acesso: %s\n", array_acessos[x].nome);
+                printf("Login: %s\n", array_acessos[x].login);
+                printf("Password: %s\n", array_acessos[x].password);
+                printf("____________________________________\n");
+            }
         }
     }
+    getch();
 }
 
 void RecursoComMaisAcessos(t_acessos array_acessos[], t_recursos array_recursos[], int contador_a, int contador_r)
 {
     int numero_acessos=0, contador=0, id_recurso=-1, i, j;
 
-    for (i=0; i < contador_r; i++)
+    if (contador_a == 0)
     {
-        contador = 0;
-        for (j=0; j < contador_a; j++)
-        {
-            if (array_recursos[i].ID_Recurso == array_acessos[j].id_recurso)
-            {
-                contador++;
-            }
-
-        }
-        if (contador > numero_acessos)
-        {
-            numero_acessos = contador;
-            id_recurso = array_acessos[i].id_recurso;
-            contador = i;
-        }
+        printf("\n\tNenhum utilizador tem acessos guardados\n");
     }
-    printf("\t________________________\n");
-    printf("\n\tO recurso com mais acessos é o: %s, com %d acessos.\n", array_recursos[contador].nome, numero_acessos);
+    else
+    {
+        for (i=0; i < contador_r; i++)
+        {
+            contador = 0;
+            for (j=0; j < contador_a; j++)
+            {
+                if (array_recursos[i].ID_Recurso == array_acessos[j].id_recurso)
+                {
+                    contador++;
+                }
+
+            }
+            if (contador > numero_acessos)
+            {
+                numero_acessos = contador;
+                id_recurso = array_acessos[i].id_recurso;
+                contador = i;
+            }
+        }
+        printf("\t________________________\n");
+        printf("\n\tO recurso com mais acessos é o: %s, com %d acessos.\n", array_recursos[contador].nome, numero_acessos);
+    }
+    getch();
 }
 
 void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_registo[], int contador_a, int contador_r, int contador_registar)
@@ -1762,9 +1841,57 @@ void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_reg
             numero_acessos = contador;
             id_utilizador = array_acessos[i].id_recurso;
             contador = i;
-            if (contador == numero_acessos)
         }
     }
     printf("\t________________________\n");
-    printf("\n\tO utilizador com mais acessos é o: %s, com %d acessos.\n", user_registo[id_utilizador].nome, numero_acessos);
+    printf("\n\tO utilizador com mais acessos é o: %s, com %d acessos.\n", user_registo[contador].nome, numero_acessos);
+    getch();
+}
+
+void DiasDesdeUltimoAcesso(t_recursos array_recursos[], t_acessos array_acessos[], int contador_r, int contador_a)
+{
+    int soma_data_atual = 0, acesso_mais_velho = 0;
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
+    soma_data_atual = tm.tm_year + 1900 + tm.tm_mon + 1 + tm.tm_mday + tm.tm_hour + tm.tm_min;
+    printf("%d + %d + %d + %d + %d\n", tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min);
+
+    char recurso[MAX_CARACTERES];
+    int encontrado, hora, dia, mes, ano;
+
+    printf("\n\tIndique o nome do recurso que pretende eliminar: ");
+    scanf("%s", recurso);
+
+    for(int i = 0; i < contador_r; i++)
+    {
+        encontrado = strcasecmp(array_recursos[i].nome, recurso);
+        if (encontrado == 0)
+        {
+            /*printf("Introduza a data e hora atual");
+            printf("Dia: ");
+            printf("Mês: ");
+            printf("Ano: ");*/
+            for (int j=1; j < contador_a; j++)
+            {
+                if (array_recursos[i].ID_Recurso == array_acessos[j].id_recurso)
+                {
+
+                }
+                else
+                {
+                    printf("O recurso não tem acessos\n");
+                }
+
+            }
+        }
+    }
+    if (encontrado != 0)
+    {
+        printf("\n\tO recurso que introduziu não corresponde.\n");
+    }
+    printf("O acesso mais velho: %s", array_acessos[acesso_mais_velho].nome);
+    getch();
 }
