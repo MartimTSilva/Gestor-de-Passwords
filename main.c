@@ -1775,7 +1775,7 @@ void ListagemAcessos(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos ar
         scanf("%d", &utilizador);
         for (int x = 0 ; x < contador_a ; x++)
         {
-            if (array_acessos[x+1].id_utilizador == utilizador)
+            if (array_acessos[x].id_utilizador == utilizador)
             {
                 printf("____________________________________\n\n");
                 printf("Nome do acesso: %s\n", array_acessos[x].nome);
