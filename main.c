@@ -67,8 +67,6 @@ char gerador_espec[18] = { '_', '.', '-', '$', '/', '&', '(', ')', '[', ']', '?'
 
 ///Funções Menus/////////////////
 int MenuInicial(void);
-int MenuRegistar(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores, int *seq_ID_Utlizador);
-int MenuLogin (t_utilizadores user_registo[MAX_UTILIZADORES],int contador_utilizadores);
 char MenuPrincipal(t_utilizadores user_registo[MAX_UTILIZADORES], int utilizador_logado);
 char MenuGestor(void);
 void MenuSobre(void);
@@ -100,6 +98,8 @@ void EliminarRecursos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_rec
 
 
 ///Funções Utilizadores/////////////////
+int MenuRegistar(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores, int *seq_ID_Utlizador);
+int MenuLogin (t_utilizadores user_registo[MAX_UTILIZADORES],int contador_utilizadores);
 void VerUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES],int contador_utilizadores, int utilizador_logado);
 int InserirAdmin(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores);
 void AlterarUtilizadoresNome(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores);
@@ -114,8 +114,8 @@ void VerDadosUtilizador(t_utilizadores user_registo[MAX_UTILIZADORES], int conta
 
 ///Outras Funções/////////////////
 void VerificadorPassword(t_recursos array_recursos[], int contador_r, char *password[]);
-void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int *contador_utilizadores, int *contador_r, int *contador_a);
-int guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_utilizadores, int contador_r, int contador_a);
+void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int *contador_utilizadores, int *contador_r, int *contador_a, int *seq_ID_Utlizador, int *seq_ID_Recursos);
+int guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_utilizadores, int contador_r, int contador_a, int seq_ID_Utlizador, int seq_ID_Recursos);
 t_data getdate();
 t_hour gethour();
 ///Outras Funções/////////////////
@@ -123,12 +123,20 @@ t_hour gethour();
 
 ///Funções das estatisticas///////////////
 char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES], int utilizador_logado);
-void  ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r);
-void  ListagemAcessos(t_utilizadores user_registo[], t_acessos array_acessos[], int contador_utilizadores, int *contador_a);
+void ListagemRecursosPorTipo(t_recursos array_recursos[], int *contador_r);
+void ListagemAcessos(t_utilizadores user_registo[], t_acessos array_acessos[], int contador_utilizadores, int *contador_a);
 void RecursoComMaisAcessos(t_acessos array_acessos[MAX_ACESSOS], t_recursos array_recursos[MAX_RECURSOS], int contador_a, int contador_r);
 void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_registo[], int contador_a, int contador_r, int contador_registar);
 void DiasDesdeUltimoAcesso(t_recursos array_recursos[], t_acessos array_acessos[], int contador_r, int contador_a);
 ///Funções das estatisticas///////////////
+
+
+///To store number of days in all months from January to Dec.
+const int monthDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+int getDifference(t_data dt1, t_data dt2);
+int countLeapYears(t_data d);
+
+
 
 int main()
 {
@@ -141,7 +149,7 @@ int main()
     t_utilizadores user_registo[MAX_UTILIZADORES];
 
     contador_registar = InserirAdmin(user_registo, contador_registar);
-    ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
+    ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos, &seq_ID_Utlizador, &seq_ID_Recursos);
 
     do
     {
@@ -338,10 +346,10 @@ int main()
                 while(opcao5 != 'V');
                 break;
             case 'C':
-                ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos);
+                ler_ficheiro(user_registo, arr_recursos, arr_acessos, &contador_registar, &contador_recursos, &contador_acessos, &seq_ID_Utlizador, &seq_ID_Recursos);
                 break;
             case 'D':
-                ficheiro_guardado = guardar_ficheiro(user_registo, arr_recursos, arr_acessos,contador_registar, contador_recursos, contador_acessos);
+                ficheiro_guardado = guardar_ficheiro(user_registo, arr_recursos, arr_acessos, contador_registar, contador_recursos, contador_acessos, seq_ID_Utlizador, seq_ID_Recursos);
                 break;
             case 'E':
                 do
@@ -1203,7 +1211,7 @@ int InserirAdmin(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_uti
     return contador_utilizadores+1;
 }
 
-void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int *contador_utilizadores, int *contador_r, int *contador_a)
+void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int *contador_utilizadores, int *contador_r, int *contador_a, int *seq_ID_Utlizador, int *seq_ID_Recursos)
 {
     int n_elementos, n_elementos_lidos;
     FILE *ficheiro;
@@ -1218,26 +1226,18 @@ void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos arra
         fread(&(*contador_utilizadores), sizeof(int), 1, ficheiro);
         fread(&(*contador_r), sizeof(int), 1, ficheiro);
         fread(&(*contador_a), sizeof(int), 1, ficheiro);
+        fread(&(*seq_ID_Utlizador), sizeof(int), 1, ficheiro);
+        fread(&(*seq_ID_Recursos), sizeof(int), 1, ficheiro);
 
         fread(user_registo, sizeof(t_utilizadores), *contador_utilizadores, ficheiro);
         fread(array_recursos, sizeof(t_recursos), *contador_r, ficheiro);
         fread(array_acessos, sizeof(t_acessos), *contador_a, ficheiro);
 
-        /*if (n_elementos_lidos != n_elementos)
-        {
-            printf("Impossivel ler o ficheiro\n\n");
-            n_elementos = 0;
-        }
-        else
-        {
-            printf("\nA LER...\n\n");
-            (*contador_utilizadores) = n_elementos;
-        }*/
         fclose(ficheiro);
     }
 }
 
-int guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_utilizadores, int contador_r, int contador_a)
+int guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int contador_utilizadores, int contador_r, int contador_a, int seq_ID_Utlizador, int seq_ID_Recursos)
 {
     int ficheiro_guardado=0;
     FILE *ficheiro;
@@ -1251,6 +1251,8 @@ int guardar_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos a
         fwrite(&contador_utilizadores, sizeof(int), 1, ficheiro);
         fwrite(&contador_r, sizeof(int), 1, ficheiro);
         fwrite(&contador_a, sizeof(int), 1, ficheiro);
+        fwrite(&seq_ID_Utlizador, sizeof(int), 1, ficheiro);
+        fwrite(&seq_ID_Recursos, sizeof(int), 1, ficheiro);
 
         fwrite(user_registo, sizeof(t_utilizadores), contador_utilizadores, ficheiro);
         fwrite(array_recursos, sizeof(t_recursos), contador_r, ficheiro);
@@ -1766,22 +1768,23 @@ void ListagemAcessos(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos ar
     else
     {
         system("cls");
-        for (int i = 1 ; i < contador_utilizadores ; i++)
+        printf("\n\tTodos os utilizadores:\n\n");
+        for (int i = 0; i < contador_utilizadores ; i++)
         {
             printf("%d - %s\n", i, user_registo[i].login_utilizador);
         }
-        printf("\nIntroduza o número do utilizador: ");
+        printf("\n\tIntroduza o número do utilizador: ");
         fflush(stdin);
         scanf("%d", &utilizador);
         for (int x = 0 ; x < contador_a ; x++)
         {
             if (array_acessos[x].id_utilizador == utilizador)
             {
-                printf("____________________________________\n\n");
-                printf("Nome do acesso: %s\n", array_acessos[x].nome);
-                printf("Login: %s\n", array_acessos[x].login);
-                printf("Password: %s\n", array_acessos[x].password);
-                printf("____________________________________\n");
+                printf("\n\t____________________________________");
+                printf("\n\tNome do acesso: %s", array_acessos[x].nome);
+                printf("\n\tLogin: %s", array_acessos[x].login);
+                printf("\n\tPassword: %s", array_acessos[x].password);
+                printf("\n\t____________________________________\n");
             }
         }
     }
@@ -1807,7 +1810,6 @@ void RecursoComMaisAcessos(t_acessos array_acessos[], t_recursos array_recursos[
                 {
                     contador++;
                 }
-
             }
             if (contador > numero_acessos)
             {
@@ -1850,19 +1852,16 @@ void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_reg
 
 void DiasDesdeUltimoAcesso(t_recursos array_recursos[], t_acessos array_acessos[], int contador_r, int contador_a)
 {
-    int soma_data_atual = 0, acesso_mais_velho = 0;
-
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-
-    printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
-    soma_data_atual = tm.tm_year + 1900 + tm.tm_mon + 1 + tm.tm_mday + tm.tm_hour + tm.tm_min;
-    printf("%d + %d + %d + %d + %d\n", tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min);
-
+    t_data date_now;
+    date_now.ano = tm.tm_year + 1900;
+    date_now.mes = tm.tm_mon + 1;
+    date_now.dia =  tm.tm_mday;
+    int acesso_mais_velho = 0, var1, var2, encontrado, encontrado_acessos=0;
     char recurso[MAX_CARACTERES];
-    int encontrado, hora, dia, mes, ano;
 
-    printf("\n\tIndique o nome do recurso que pretende eliminar: ");
+    printf("\n\tIndique o nome do recurso: ");
     scanf("%s", recurso);
 
     for(int i = 0; i < contador_r; i++)
@@ -1870,28 +1869,73 @@ void DiasDesdeUltimoAcesso(t_recursos array_recursos[], t_acessos array_acessos[
         encontrado = strcasecmp(array_recursos[i].nome, recurso);
         if (encontrado == 0)
         {
-            /*printf("Introduza a data e hora atual");
-            printf("Dia: ");
-            printf("Mês: ");
-            printf("Ano: ");*/
             for (int j=1; j < contador_a; j++)
             {
                 if (array_recursos[i].ID_Recurso == array_acessos[j].id_recurso)
                 {
-
+                    encontrado_acessos = 1;
+                    var1=getDifference(array_acessos[acesso_mais_velho].data, date_now);
+                    var2=getDifference(array_acessos[i].data, date_now);
+                    if(getDifference(array_acessos[acesso_mais_velho].data, date_now) < getDifference(array_acessos[i].data, date_now))
+                    {
+                        acesso_mais_velho = i;
+                        printf("ACESSO MAIS VELHO");
+                    }
                 }
-                else
-                {
-                    printf("O recurso não tem acessos\n");
-                }
-
             }
+            printf("\n\tO acesso mais velho é o: %s", array_acessos[acesso_mais_velho].login);
         }
     }
+
+    if  (encontrado_acessos == 0)
+    {
+        printf("\n\tO recurso não tem acessos\n");
+    }
+
     if (encontrado != 0)
     {
         printf("\n\tO recurso que introduziu não corresponde.\n");
     }
-    printf("O acesso mais velho: %s", array_acessos[acesso_mais_velho].nome);
+
     getch();
+}
+
+int countLeapYears(t_data d)
+{
+    int years = d.ano;
+
+    // Check if the current year needs to be considered
+    // for the count of leap years or not
+    if (d.mes <= 2)
+        years--;
+
+    // An year is a leap year if it is a multiple of 4,
+    // multiple of 400 and not a multiple of 100.
+    return years / 4 - years / 100 + years / 400;
+}
+
+int getDifference(t_data dt1, t_data dt2)
+{
+    // COUNT TOTAL NUMBER OF DAYS BEFORE FIRST DATE 'dt1'
+
+    // initialize count using years and day
+    long int n1 = dt1.ano*365 + dt1.dia;
+
+    // Add days for months in given date
+    for (int i=0; i<dt1.mes - 1; i++)
+        n1 += monthDays[i];
+
+    // Since every leap year is of 366 days,
+    // Add a day for every leap year
+    n1 += countLeapYears(dt1);
+
+    // SIMILARLY, COUNT TOTAL NUMBER OF DAYS BEFORE 'dt2'
+
+    long int n2 = dt2.ano*365 + dt2.dia;
+    for (int i=0; i<dt2.mes - 1; i++)
+        n2 += monthDays[i];
+    n2 += countLeapYears(dt2);
+
+    // return difference between two counts
+    return (n2 - n1);
 }
