@@ -106,7 +106,6 @@ void AlterarUtilizadoresNome(t_utilizadores user_registo[MAX_UTILIZADORES], int 
 void AlterarUtilizadoresLogin(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores);
 void AlterarUtilizadoresPasswords(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores);
 void AlterarUtilizadoresNIC(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores);
-void AlterarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores);
 void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acessos array_acessos[MAX_ACESSOS], int *contador_utilizadores, int id_utilizador, int contador_a);
 void VerDadosUtilizador(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_utilizadores);
 ///Funções Utilizadores/////////////////
@@ -130,12 +129,13 @@ void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_reg
 void DiasDesdeUltimoAcesso(t_recursos array_recursos[], t_acessos array_acessos[], int contador_r, int contador_a);
 ///Funções das estatisticas///////////////
 
-
+/*
+///Reutilização do código de: https://www.geeksforgeeks.org/find-number-of-days-between-two-given-dates/
 ///To store number of days in all months from January to Dec.
 const int monthDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 int getDifference(t_data dt1, t_data dt2);
 int countLeapYears(t_data d);
-
+*/
 
 
 int main()
@@ -280,7 +280,7 @@ int main()
                                 UtilizadorComMaisAcessos(arr_acessos, user_registo, contador_acessos, contador_recursos, contador_registar);
                                 break;
                             case 'E':
-                                DiasDesdeUltimoAcesso(arr_recursos, arr_acessos, contador_recursos, contador_acessos);
+                                //DiasDesdeUltimoAcesso(arr_recursos, arr_acessos, contador_recursos, contador_acessos);
                                 break;
                             case 'V':
                                 break;
@@ -1213,7 +1213,6 @@ int InserirAdmin(t_utilizadores user_registo[MAX_UTILIZADORES], int contador_uti
 
 void ler_ficheiro(t_utilizadores user_registo[MAX_UTILIZADORES], t_recursos array_recursos[MAX_ACESSOS], t_acessos array_acessos[MAX_RECURSOS], int *contador_utilizadores, int *contador_r, int *contador_a, int *seq_ID_Utlizador, int *seq_ID_Recursos)
 {
-    int n_elementos, n_elementos_lidos;
     FILE *ficheiro;
     ficheiro = fopen("dados.dat", "rb");
 
@@ -1655,12 +1654,10 @@ void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acess
         scanf("%s", utilizador_a_eliminar);
         for(i = 0; i < *contador_utilizadores; i++)
         {
-            getch();
             if(strcasecmp(user_registo[i].login_utilizador, utilizador_a_eliminar)==0)
             {
                 encontrado=i;
                 i=(*contador_utilizadores);
-                getch();
             }
         }
 
@@ -1672,7 +1669,6 @@ void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acess
                 {
                     printf("\n\tImpossivel eliminar porque você tem acessos guardados\n");
                     eliminar = 0;
-                    getch();
                 }
             }
 
@@ -1692,14 +1688,13 @@ void EliminarUtilizadores(t_utilizadores user_registo[MAX_UTILIZADORES], t_acess
         else
         {
             printf("\n\tUtilizador não encontrado\n");
-            getch();
         }
     }
     else
     {
         printf("\n\tFuncionalidade apenas para o administrador. Se pretender eliminar a sua conta, peça ao administrador.\n");
-        getch();
     }
+    getch();
 }
 
 char MenuEstatisticas(t_utilizadores user_registo[MAX_UTILIZADORES],int utilizador_logado)
@@ -1850,6 +1845,7 @@ void UtilizadorComMaisAcessos(t_acessos array_acessos[], t_utilizadores user_reg
     getch();
 }
 
+/*
 void DiasDesdeUltimoAcesso(t_recursos array_recursos[], t_acessos array_acessos[], int contador_r, int contador_a)
 {
     time_t t = time(NULL);
@@ -1900,6 +1896,8 @@ void DiasDesdeUltimoAcesso(t_recursos array_recursos[], t_acessos array_acessos[
     getch();
 }
 
+
+///Reutilização do código de: https://www.geeksforgeeks.org/find-number-of-days-between-two-given-dates/
 int countLeapYears(t_data d)
 {
     int years = d.ano;
@@ -1913,7 +1911,6 @@ int countLeapYears(t_data d)
     // multiple of 400 and not a multiple of 100.
     return years / 4 - years / 100 + years / 400;
 }
-
 int getDifference(t_data dt1, t_data dt2)
 {
     // COUNT TOTAL NUMBER OF DAYS BEFORE FIRST DATE 'dt1'
@@ -1939,3 +1936,5 @@ int getDifference(t_data dt1, t_data dt2)
     // return difference between two counts
     return (n2 - n1);
 }
+///Reutilização do código de: https://www.geeksforgeeks.org/find-number-of-days-between-two-given-dates/
+*/
